@@ -123,7 +123,6 @@ p {
 }
 
 .price-box {
- .price-box {
   background: linear-gradient(145deg, #111, #0a0a0a);
   border: 1px solid #222;
   padding: 30px;
@@ -234,6 +233,68 @@ section:last-of-type {
   <h2>Availability</h2>
   <p>Only 5 slots available this month</p>
 </section>
+
+  <section>
+  <h2>Availability</h2>
+
+  <p style="color:#aaa;">
+    Select an available date. Once a portrait is booked, that entire week becomes unavailable.
+  </p>
+
+  <div class="calendar">
+    <div class="day available">1</div>
+    <div class="day available">2</div>
+    <div class="day booked">3</div>
+    <div class="day booked">4</div>
+    <div class="day booked">5</div>
+    <div class="day booked">6</div>
+    <div class="day booked">7</div>
+
+    <div class="day available">8</div>
+    <div class="day available">9</div>
+    <div class="day available">10</div>
+    <div class="day available">11</div>
+    <div class="day available">12</div>
+    <div class="day available">13</div>
+    <div class="day available">14</div>
+
+    <!-- continue -->
+  </div>
+
+  <p style="color:#888; font-size:14px; margin-top:20px;">
+    🟢 Available &nbsp;&nbsp; ⚫ Booked (week locked after booking)
+  </p>
+</section>
+
+  .calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+.day {
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #111;
+}
+
+.available {
+  border: 1px solid #333;
+  cursor: pointer;
+}
+
+.available:hover {
+  border-color: #fff;
+}
+
+.booked {
+  background: #222;
+  color: #666;
+  text-decoration: line-through;
+}
 
 <section>
   <h2>How It Works</h2>
