@@ -217,26 +217,72 @@ p {
 <!-- AVAILABILITY -->
 <section>
   <h2>Availability</h2>
-  <p>Select a date. Once booked, the entire week becomes unavailable.</p>
+  <p>Select a date. Booked dates block the entire week.</p>
 
-  <div class="calendar">
-    <div class="day available">1</div>
-    <div class="day available">2</div>
-    <div class="day booked">3</div>
-    <div class="day booked">4</div>
-    <div class="day booked">5</div>
-    <div class="day booked">6</div>
-    <div class="day booked">7</div>
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <button onclick="changeMonth(-1)">←</button>
+      <h3 id="monthYear"></h3>
+      <button onclick="changeMonth(1)">→</button>
+    </div>
 
-    <div class="day available">8</div>
-    <div class="day available">9</div>
-    <div class="day available">10</div>
-    <div class="day available">11</div>
-    <div class="day available">12</div>
-    <div class="day available">13</div>
-    <div class="day available">14</div>
+    <div class="calendar-grid" id="calendar"></div>
   </div>
+
+  <p style="color:#888; font-size:14px;">
+    🟢 Available &nbsp;&nbsp; ⚫ Booked
+  </p>
 </section>
+
+  .calendar-container {
+  max-width: 400px;
+  margin: 30px auto;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.calendar-header button {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.day {
+  padding: 12px;
+  background: #111;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.available {
+  border: 1px solid #333;
+  cursor: pointer;
+}
+
+.available:hover {
+  border-color: #fff;
+}
+
+.booked {
+  background: #222;
+  color: #666;
+  text-decoration: line-through;
+}
 
 <!-- HOW IT WORKS -->
 <section>
@@ -268,7 +314,81 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 
 sections.forEach(section => observer.observe(section));
+
+  <script>
+const sections = document.querySelectorAll("section");
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("show");
+    }
+  });
+}, { threshold: 0.15 });
+
+sections.forEach(section => observer.observe(section));
+
+/* 👇 PASTE CALENDAR CODE BELOW THIS 👇 */
+
+let currentDate = new Date();
+
+const bookedDates = [
+  "2026-03-03",
+  "2026-03-04",
+  "2026-03-05",
+  "2026-03-06",
+  "2026-03-07"
+];
+
+function renderCalendar() {
+  const calendar = document.getElementById("calendar");
+  const monthYear = document.getElementById("monthYear");
+
+  calendar.innerHTML = "";
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  monthYear.innerText = currentDate.toLocaleString("default", {
+    month: "long",
+    year: "numeric"
+  });
+
+  for (let i = 0; i < firstDay; i++) {
+    calendar.innerHTML += `<div></div>`;
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isBooked = bookedDates.includes(dateStr);
+    const className = isBooked ? "day booked" : "day available";
+
+    calendar.innerHTML += `
+      <div class="${className}" onclick="selectDate('${dateStr}')">
+        ${day}
+      </div>
+    `;
+  }
+}
+
+function changeMonth(direction) {
+  currentDate.setMonth(currentDate.getMonth() + direction);
+  renderCalendar();
+}
+
+function selectDate(date) {
+  if (bookedDates.includes(date)) return;
+
+  const msg = `Hi, I want to book a portrait for ${date}`;
+  window.open(`https://wa.me/919945070481?text=${encodeURIComponent(msg)}`, "_blank");
+}
+
+renderCalendar();
+
 </script>
 
 </body>
 </html>
+
