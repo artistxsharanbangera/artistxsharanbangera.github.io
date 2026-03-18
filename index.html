@@ -12,8 +12,7 @@ body {
   color: #fff;
   scroll-behavior: smooth;
 
-  /* 🔥 Apple-style gradient */
-  background: radial-gradient(circle at top, #1a1a1a, #000 60%);
+  background: radial-gradient(circle at 50% -20%, #2a2a2a, #000 70%);
 }
 
 /* SOFT SECTION SPACING */
@@ -104,6 +103,9 @@ p {
 
 .portfolio div:hover img {
   transform: scale(1.08);
+  box-shadow: 
+  0 10px 30px rgba(0,0,0,0.6),
+  inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 /* PRICING */
@@ -121,13 +123,17 @@ p {
 }
 
 .price-box {
+ .price-box {
   background: linear-gradient(145deg, #111, #0a0a0a);
   border: 1px solid #222;
   padding: 30px;
   border-radius: 20px;
   text-align: left;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 .price-box:hover {
