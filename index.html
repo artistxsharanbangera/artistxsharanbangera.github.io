@@ -10,16 +10,16 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   color: #fff;
-  scroll-behavior: smooth;
   background: radial-gradient(circle at 50% -20%, #2a2a2a, #000 70%);
 }
 
+/* SECTION */
 section {
   padding: 100px 20px;
   text-align: center;
   opacity: 0;
   transform: translateY(40px);
-  transition: all 0.8s ease;
+  transition: 0.8s;
 }
 
 section.show {
@@ -27,34 +27,19 @@ section.show {
   transform: translateY(0);
 }
 
-h1 {
-  font-size: 2.8rem;
-  max-width: 800px;
-  margin: auto;
-}
+h1 { font-size: 2.8rem; }
+h2 { font-size: 2rem; }
+p { color: #aaa; }
 
-h2 {
-  font-size: 2rem;
-}
-
-p {
-  color: #aaa;
-}
-
+/* BUTTON */
 .btn {
   display: inline-block;
   padding: 16px 32px;
-  background: linear-gradient(145deg, #fff, #ddd);
+  background: #fff;
   color: #000;
   border-radius: 999px;
   text-decoration: none;
   margin-top: 20px;
-  transition: 0.3s;
-}
-
-.btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(255,255,255,0.15);
 }
 
 /* PORTFOLIO */
@@ -67,15 +52,12 @@ p {
 }
 
 @media (min-width: 768px) {
-  .portfolio {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .portfolio { grid-template-columns: repeat(3, 1fr); }
 }
 
 .portfolio div {
   overflow: hidden;
   border-radius: 20px;
-  background: #111;
 }
 
 .portfolio img {
@@ -98,9 +80,7 @@ p {
 }
 
 @media (min-width: 768px) {
-  .pricing-split {
-    grid-template-columns: 1fr 1fr;
-  }
+  .pricing-split { grid-template-columns: 1fr 1fr; }
 }
 
 .price-box {
@@ -124,22 +104,41 @@ p {
 }
 
 /* CALENDAR */
-.calendar {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  max-width: 600px;
+.calendar-container {
+  max-width: 400px;
   margin: 30px auto;
 }
 
-.day {
-  padding: 16px;
-  border-radius: 10px;
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calendar-header button {
   background: #111;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.day {
+  padding: 12px;
+  background: #111;
+  border-radius: 8px;
 }
 
 .available {
   border: 1px solid #333;
+  cursor: pointer;
 }
 
 .available:hover {
@@ -159,9 +158,7 @@ p {
 }
 
 @media (min-width: 768px) {
-  .steps {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .steps { grid-template-columns: repeat(3, 1fr); }
 }
 </style>
 </head>
@@ -196,7 +193,6 @@ p {
   <p>Base price includes one person</p>
 
   <div class="pricing-split">
-
     <div class="price-box">
       <h3>B/W Pencil Sketch</h3>
       <div class="row"><span>A5</span><span>₹1000 (+₹500/person)</span></div>
@@ -210,7 +206,6 @@ p {
       <div class="row highlight"><span>A4</span><span>₹4000 (+₹1500/person)</span></div>
       <div class="row"><span>A3</span><span>₹9000 (+₹3000/person)</span></div>
     </div>
-
   </div>
 </section>
 
@@ -228,61 +223,7 @@ p {
 
     <div class="calendar-grid" id="calendar"></div>
   </div>
-
-  <p style="color:#888; font-size:14px;">
-    🟢 Available &nbsp;&nbsp; ⚫ Booked
-  </p>
 </section>
-
-  .calendar-container {
-  max-width: 400px;
-  margin: 30px auto;
-}
-
-.calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.calendar-header button {
-  background: #111;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-}
-
-.day {
-  padding: 12px;
-  background: #111;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 14px;
-}
-
-.available {
-  border: 1px solid #333;
-  cursor: pointer;
-}
-
-.available:hover {
-  border-color: #fff;
-}
-
-.booked {
-  background: #222;
-  color: #666;
-  text-decoration: line-through;
-}
 
 <!-- HOW IT WORKS -->
 <section>
@@ -305,30 +246,16 @@ p {
 
 <script>
 const sections = document.querySelectorAll("section");
+
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add("show");
-    }
+    if (entry.isIntersecting) entry.target.classList.add("show");
   });
 }, { threshold: 0.15 });
 
 sections.forEach(section => observer.observe(section));
 
-  <script>
-const sections = document.querySelectorAll("section");
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add("show");
-    }
-  });
-}, { threshold: 0.15 });
-
-sections.forEach(section => observer.observe(section));
-
-/* 👇 PASTE CALENDAR CODE BELOW THIS 👇 */
-
+/* CALENDAR */
 let currentDate = new Date();
 
 const bookedDates = [
@@ -363,10 +290,10 @@ function renderCalendar() {
   for (let day = 1; day <= daysInMonth; day++) {
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const isBooked = bookedDates.includes(dateStr);
-    const className = isBooked ? "day booked" : "day available";
 
     calendar.innerHTML += `
-      <div class="${className}" onclick="selectDate('${dateStr}')">
+      <div class="day ${isBooked ? "booked" : "available"}"
+           onclick="selectDate('${dateStr}')">
         ${day}
       </div>
     `;
@@ -381,14 +308,14 @@ function changeMonth(direction) {
 function selectDate(date) {
   if (bookedDates.includes(date)) return;
 
-  const msg = `Hi, I want to book a portrait for ${date}`;
-  window.open(`https://wa.me/919945070481?text=${encodeURIComponent(msg)}`, "_blank");
+  window.open(
+    `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
+    "_blank"
+  );
 }
 
 renderCalendar();
-
 </script>
 
 </body>
 </html>
-
