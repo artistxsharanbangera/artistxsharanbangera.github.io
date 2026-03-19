@@ -381,9 +381,25 @@ function renderCalendar() {
       calendar.innerHTML += `<div></div>`;
     }
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      calendar.innerHTML += `<div class="day available">${day}</div>`;
-    }
+    const today = new Date();
+today.setHours(0,0,0,0);
+
+for (let day = 1; day <= daysInMonth; day++) {
+  const dateObj = new Date(year, month, day);
+  const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+
+  let className = "day available";
+
+  if (dateObj < today) {
+    className = "day booked"; // greyed out
+  }
+
+  calendar.innerHTML += `
+    <div class="${className}" onclick="selectDate('${dateStr}')">
+      ${day}
+    </div>
+  `;
+}
 
     calendar.classList.remove("fade");
   }, 200);
