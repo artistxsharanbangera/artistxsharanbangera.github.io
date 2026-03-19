@@ -351,11 +351,22 @@ p {
 
 .row:last-child { border-bottom: none; }
 
-.row .size-label {
+.row 
+.size-cm {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.size-label {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.05rem;
   color: var(--cream);
-  min-width: 30px;
+  min-width: 50px;
+  display: flex;
+  flex-direction: column;
 }
 
 .row .price-info {
@@ -583,6 +594,29 @@ footer {
 }
 footer a { color: var(--gold); text-decoration: none; }
 
+
+/* ── SIZE COMPARISON ─────────────────────── */
+.size-comparison-section { padding-bottom: 60px; }
+
+.size-comparison-wrap {
+  max-width: 820px;
+  margin: 36px auto 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid rgba(201,169,110,0.12);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+
+.size-comparison-img {
+  width: 100%;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.size-comparison-wrap:hover .size-comparison-img {
+  transform: scale(1.02);
+}
+
 /* ── MOBILE OVERRIDES ────────────────────── */
 @media (max-width: 480px) {
   .hero-ctas { flex-direction: column; align-items: center; }
@@ -590,6 +624,85 @@ footer a { color: var(--gold); text-decoration: none; }
   .pricing-notes { padding: 14px 16px; }
   .step-card { text-align: left; }
 }
+
+/* ── PRICING THUMBNAILS ──────────────────── */
+.thumb-wrap {
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.price-thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(201,169,110,0.25);
+  display: block;
+  transition: transform 0.2s, border-color 0.2s;
+  background: rgba(255,255,255,0.04);
+}
+
+.thumb-wrap:hover .price-thumb {
+  transform: scale(1.08);
+  border-color: var(--gold);
+}
+
+.thumb-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  background: rgba(0,0,0,0.5);
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.thumb-wrap:hover .thumb-icon { opacity: 1; }
+
+/* price lightbox */
+.price-lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(8,6,4,0.97);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+.price-lightbox.open { display: flex; }
+.price-lightbox img {
+  max-width: min(88vw, 500px);
+  max-height: 75svh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+}
+.price-lightbox-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: var(--gold-lt);
+  letter-spacing: 0.1em;
+}
+.price-lightbox-close {
+  position: fixed;
+  top: 20px; right: 24px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.price-lightbox-close:hover { color: var(--cream); }
+
 </style>
 </head>
 
@@ -642,15 +755,18 @@ footer a { color: var(--gold); text-decoration: none; }
     <div class="price-box">
       <h3>B/W Pencil Sketch</h3>
       <div class="row">
-        <span class="size-label">A5</span>
+        <span class="size-label">A5<span class="size-cm">14.8 × 21 cm</span></span>
+        <span class="thumb-wrap" onclick="openPriceThumb('images/pricing/bw-a5.jpg','B/W · A5')"><img src="images/pricing/bw-a5.jpg" class="price-thumb" alt="B/W A5 example"><span class="thumb-icon">🔍</span></span>
         <span class="price-info"><span class="main-price">Starts at ₹1,000</span><span class="sub-price">+₹500 / extra person</span></span>
       </div>
       <div class="row highlight">
-        <span class="size-label">A4</span>
+        <span class="size-label">A4<span class="size-cm">21 × 29.7 cm</span></span>
+        <span class="thumb-wrap" onclick="openPriceThumb('images/pricing/bw-a4.jpg','B/W · A4')"><img src="images/pricing/bw-a4.jpg" class="price-thumb" alt="B/W A4 example"><span class="thumb-icon">🔍</span></span>
         <span class="price-info"><span class="main-price">Starts at ₹2,500</span><span class="sub-price">+₹1,200 / extra person</span></span>
       </div>
       <div class="row">
-        <span class="size-label">A3</span>
+        <span class="size-label">A3<span class="size-cm">29.7 × 42 cm</span></span>
+        <span class="thumb-wrap" onclick="openPriceThumb('images/pricing/bw-a3.jpg','B/W · A3')"><img src="images/pricing/bw-a3.jpg" class="price-thumb" alt="B/W A3 example"><span class="thumb-icon">🔍</span></span>
         <span class="price-info"><span class="main-price">Starts at ₹7,000</span><span class="sub-price">+₹2,000 / extra person</span></span>
       </div>
     </div>
@@ -658,15 +774,18 @@ footer a { color: var(--gold); text-decoration: none; }
     <div class="price-box">
       <h3>Colour Pencil Sketch</h3>
       <div class="row">
-        <span class="size-label">A5</span>
+        <span class="size-label">A5<span class="size-cm">14.8 × 21 cm</span></span>
+        <span class="thumb-wrap" onclick="openPriceThumb('images/pricing/colour-a5.jpg','Colour · A5')"><img src="images/pricing/colour-a5.jpg" class="price-thumb" alt="Colour A5 example"><span class="thumb-icon">🔍</span></span>
         <span class="price-info"><span class="main-price">Starts at ₹1,500</span><span class="sub-price">+₹700 / extra person</span></span>
       </div>
       <div class="row highlight">
-        <span class="size-label">A4</span>
+        <span class="size-label">A4<span class="size-cm">21 × 29.7 cm</span></span>
+        <span class="thumb-wrap" onclick="openPriceThumb('images/pricing/colour-a4.jpg','Colour · A4')"><img src="images/pricing/colour-a4.jpg" class="price-thumb" alt="Colour A4 example"><span class="thumb-icon">🔍</span></span>
         <span class="price-info"><span class="main-price">Starts at ₹4,000</span><span class="sub-price">+₹1,500 / extra person</span></span>
       </div>
       <div class="row">
-        <span class="size-label">A3</span>
+        <span class="size-label">A3<span class="size-cm">29.7 × 42 cm</span></span>
+        <span class="thumb-wrap" onclick="openPriceThumb('images/pricing/colour-a3.jpg','Colour · A3')"><img src="images/pricing/colour-a3.jpg" class="price-thumb" alt="Colour A3 example"><span class="thumb-icon">🔍</span></span>
         <span class="price-info"><span class="main-price">Starts at ₹9,000</span><span class="sub-price">+₹3,000 / extra person</span></span>
       </div>
     </div>
@@ -678,6 +797,16 @@ footer a { color: var(--gold); text-decoration: none; }
       🖼 &nbsp;Premium frames available: ₹800 – ₹1,500<br>
       💳 &nbsp;50% advance required to start the artwork
     </p>
+  </div>
+</section>
+
+<!-- ── SIZE COMPARISON ── -->
+<section class="dark-section size-comparison-section">
+  <h2>Size Reference</h2>
+  <div class="divider"><span>✦</span></div>
+  <p>A real-world look at how different sizes compare</p>
+  <div class="size-comparison-wrap">
+    <img src="images/size-comparison.png" alt="Size comparison of different portrait sizes" class="size-comparison-img">
   </div>
 </section>
 
@@ -736,13 +865,14 @@ footer a { color: var(--gold); text-decoration: none; }
     <p>Limited slots available each month. Reach out today.</p>
     <div class="cta-buttons">
       <a href="https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait" class="btn btn-primary">Book on WhatsApp</a>
+      <a href="gallery.html" class="btn btn-outline">View Full Gallery</a>
       <a href="form.html" class="btn btn-outline">Request via Form</a>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>© 2025 Sharan Bangera · <a href="https://wa.me/919945070481">WhatsApp</a></p>
+  <p>© 2025 Sharan Bangera · <a href="https://wa.me/919945070481">WhatsApp</a> · <a href="gallery.html">Full Gallery</a></p>
 </footer>
 
 <script>
@@ -956,5 +1086,13 @@ const observer = new IntersectionObserver(entries => {
 
 document.querySelectorAll("section").forEach(s => observer.observe(s));
 </script>
+
+<!-- ── PRICE THUMBNAIL LIGHTBOX ── -->
+<div class="price-lightbox" id="priceLightbox">
+  <button class="price-lightbox-close" onclick="closePriceThumb()">✕</button>
+  <img id="priceLightboxImg" src="" alt="">
+  <div class="price-lightbox-label" id="priceLightboxLabel"></div>
+</div>
+
 </body>
 </html>
