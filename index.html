@@ -366,41 +366,74 @@ p { color: #aaa; }
 <script>
 let currentDate = new Date();
 
+let calendarTimeout; // add this above the function
+
 function renderCalendar() {
   const calendar = document.getElementById("calendar");
   const monthYear = document.getElementById("monthYear");
 
   if (!calendar) return;
 
-  calendar.innerHTML = "";
+  // clear any previous animation (prevents glitch on fast clicks)
+  clearTimeout(calendarTimeout);
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+  calendar.classList.add("fade");
 
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  calendarTimeout = setTimeout(() => {
+    calendar.innerHTML = "";
 
-  monthYear.innerText = currentDate.toLocaleString("default", {
-    month: "long",
-    year: "numeric"
-  });
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
 
-  for (let i = 0; i < firstDay; i++) {
-    calendar.innerHTML += `<div></div>`;
-  }
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  function selectDate(date) {
+    monthYear.innerText = currentDate.toLocaleString("default", {
+      month: "long",
+      year: "numeric"
+    });
+
+    for (let i = 0; i < firstDay; i++) {
+      calendar.innerHTML += `<div></div>`;
+    }
+
+    function selectDate(date) {
+      const today = new Date();
+      const selected = new Date(date);
+      today.setHours(0,0,0,0);
+
+      if (selected < today) return;
+
+      window.open(
+        `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
+        "_blank"
+      );
+    }
+
     const today = new Date();
-    const selected = new Date(date);
     today.setHours(0,0,0,0);
 
-    if (selected < today) return;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateObj = new Date(year, month, day);
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 
-    window.open(
-      `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
-      "_blank"
-    );
-  }
+      let className = "day available";
+
+      if (dateObj < today) {
+        className = "day booked";
+      }
+
+      calendar.innerHTML += `
+        <div class="${className}" onclick="selectDate('${dateStr}')">
+          ${day}
+        </div>
+      `;
+    }
+
+    calendar.classList.remove("fade");
+
+  }, 200);
+}
 
   const today = new Date();
   today.setHours(0,0,0,0);
