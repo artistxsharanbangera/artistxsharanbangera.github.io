@@ -3,448 +3,875 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Portrait Artist</title>
+<title>Portrait Artist · Sharan Bangera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #fff;
-  background: #000; 
+:root {
+  --cream:   #f5ede0;
+  --gold:    #c9a96e;
+  --gold-lt: #e2c998;
+  --ink:     #0e0b08;
+  --ink2:    #1c1610;
+  --ink3:    #2e2720;
+  --muted:   #8a7d6e;
+  --glass:   rgba(14,11,8,0.55);
+  --radius:  18px;
 }
 
-/* BG */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--ink);
+  color: var(--cream);
+  overflow-x: hidden;
+}
+
+/* ── BG ─────────────────────────────────── */
 .bg-glow {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-
-  background: 
-    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)),
-    url("images/bg.jpg");
-
-  background-size: cover;
-  background-position: center;
-
+  inset: 0;
+  background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)),
+    url("images/bg.jpg") center/cover no-repeat;
   z-index: -1;
-
-  opacity: 1; /* important */
-  filter: blur(2px) brightness(1.1);
-
-  transition: transform 0.2s ease-out;
+  filter: blur(2px) brightness(1.05);
+  transform-origin: center;
+  will-change: transform;
 }
-  
-/* SECTION (SAFE DEFAULT) */
+
+/* ── SECTION ─────────────────────────────── */
 section {
-  padding: 100px 20px;
+  padding: clamp(70px, 10vw, 120px) clamp(20px, 5vw, 60px);
   text-align: center;
   opacity: 1;
   transform: none;
-  transition: 0.8s;
+  transition: opacity 0.75s ease, transform 0.75s ease;
 }
 
-/* ONLY animate when JS is active */
-.js section {
-  opacity: 0;
-  transform: translateY(40px);
-}
-
-.js section.show {
-  opacity: 1;
-  transform: translateY(0);
-}
+.js section { opacity: 0; transform: translateY(36px); }
+.js section.show { opacity: 1; transform: translateY(0); }
 
 .dark-section {
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(6px);
+  background: rgba(8,6,4,0.65);
+  backdrop-filter: blur(10px);
 }
 
-/* TEXT */
-h1 { font-size: 2.8rem; }
-h2 { font-size: 2rem; }
-p { color: #aaa; }
+/* ── TYPOGRAPHY ──────────────────────────── */
+h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 300; letter-spacing: 0.02em; }
 
-/* BUTTON */
+h1 {
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1.15;
+  font-style: italic;
+  color: var(--cream);
+}
+
+h2 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--cream);
+  margin-bottom: 10px;
+}
+
+h3 {
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--gold-lt);
+}
+
+p {
+  color: var(--muted);
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  line-height: 1.7;
+}
+
+/* ── DIVIDER ─────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: center;
+  margin: 16px 0 40px;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  width: 60px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.4;
+}
+.divider span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  opacity: 0.7;
+}
+
+/* ── HERO ────────────────────────────────── */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 40px 24px;
+}
+
+.hero-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.85;
+}
+
+.hero h1 { max-width: 720px; }
+
+.hero p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  color: rgba(245,237,224,0.6);
+  margin-top: 4px;
+}
+
+/* ── BUTTON ──────────────────────────────── */
 .btn {
   display: inline-block;
-  padding: 16px 32px;
-  background: #fff;
-  color: #000;
+  padding: 14px 34px;
   border-radius: 999px;
   text-decoration: none;
-  margin-top: 20px;
+  font-size: 0.9rem;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  transition: all 0.25s ease;
 }
 
-/* PORTFOLIO */
+.btn-primary {
+  background: var(--gold);
+  color: var(--ink);
+  border: 1px solid var(--gold);
+}
+.btn-primary:hover {
+  background: var(--gold-lt);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(201,169,110,0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid rgba(245,237,224,0.25);
+}
+.btn-outline:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* ── PORTFOLIO ───────────────────────────── */
 .portfolio {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 12px;
   max-width: 1000px;
-  margin: auto;
+  margin: 0 auto;
 }
 
-@media (min-width: 768px) {
-  .portfolio { grid-template-columns: repeat(3, 1fr); }
+@media (min-width: 600px) {
+  .portfolio { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 }
 
-.portfolio div {
+.portfolio-item {
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  position: relative;
+  aspect-ratio: 4/5;
+  border: 1px solid rgba(201,169,110,0.1);
 }
 
-.portfolio img {
+.portfolio-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: 0.4s;
+  transition: transform 0.5s ease;
+  display: block;
 }
 
-.portfolio div:hover img {
-  transform: scale(1.08);
+.portfolio-item::after {
+  content: '⤢';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: var(--cream);
+  background: rgba(14,11,8,0.45);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-/* PRICING */
+.portfolio-item:hover img { transform: scale(1.07); }
+.portfolio-item:hover::after { opacity: 1; }
+
+/* ── LIGHTBOX ────────────────────────────── */
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(8,6,4,0.96);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+}
+.lightbox.open { display: flex; }
+
+.lightbox-img-wrap {
+  position: relative;
+  max-width: min(90vw, 700px);
+  max-height: 80svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: 78svh;
+  border-radius: 12px;
+  object-fit: contain;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+  transition: opacity 0.2s ease;
+}
+
+.lightbox-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(245,237,224,0.1);
+  border: 1px solid rgba(245,237,224,0.15);
+  color: var(--cream);
+  font-size: 1.4rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.lightbox-btn:hover { background: rgba(201,169,110,0.25); }
+.lightbox-btn.prev { left: -54px; }
+.lightbox-btn.next { right: -54px; }
+
+@media (max-width: 600px) {
+  .lightbox-btn.prev { left: 4px; }
+  .lightbox-btn.next { right: 4px; }
+  .lightbox-img-wrap { max-width: 100%; }
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.lightbox-close:hover { color: var(--cream); }
+
+.lightbox-counter {
+  margin-top: 20px;
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── PRICING ─────────────────────────────── */
 .pricing-split {
   display: grid;
   gap: 20px;
   max-width: 900px;
-  margin: auto;
+  margin: 0 auto;
 }
-
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .pricing-split { grid-template-columns: 1fr 1fr; }
 }
 
 .price-box {
-  background: rgba(20,20,20,0.6);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 30px;
-  border-radius: 20px;
+  background: rgba(20,16,12,0.7);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(201,169,110,0.12);
+  padding: 28px 24px;
+  border-radius: var(--radius);
+  text-align: left;
+}
+
+.price-box h3 {
+  font-size: 1.15rem;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(201,169,110,0.15);
+  color: var(--gold-lt);
 }
 
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid #222;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  gap: 10px;
 }
 
-.row span:last-child {
+.row:last-child { border-bottom: none; }
+
+.row .size-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  color: var(--cream);
+  min-width: 30px;
+}
+
+.row .price-info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  gap: 2px;
 }
 
-.main-price {
-  font-size: 16px;
-}
-
-.sub-price {
-  font-size: 10px;
-  color: #777;
-}
+.main-price { font-size: 0.92rem; color: var(--cream); }
+.sub-price  { font-size: 0.72rem; color: var(--muted); }
 
 .highlight {
-  background: rgba(255,255,255,0.04);
+  background: rgba(201,169,110,0.06);
   border-radius: 8px;
-  padding: 14px 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin: 0 -10px;
 }
 
-/* CALENDAR */
+.pricing-notes {
+  margin-top: 28px;
+  padding: 18px 22px;
+  background: rgba(201,169,110,0.06);
+  border: 1px solid rgba(201,169,110,0.12);
+  border-radius: var(--radius);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+.pricing-notes p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 2;
+}
+
+/* ── CALENDAR ────────────────────────────── */
 .calendar-container {
-  max-width: 400px;
-  margin: 30px auto;
+  max-width: 380px;
+  margin: 30px auto 0;
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
 }
 
-  /* MONTH TEXT ANIMATION */
 #monthYear {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 300;
+  color: var(--cream);
   transition: all 0.25s ease;
 }
 
-.month-left {
-  transform: translateX(-30px);
-  opacity: 0;
-}
+.month-left  { transform: translateX(-24px); opacity: 0; }
+.month-right { transform: translateX(24px);  opacity: 0; }
 
-.month-right {
-  transform: translateX(30px);
-  opacity: 0;
-}
-.calendar-header button {
-  background: #111;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
+.cal-nav {
+  background: rgba(201,169,110,0.1);
+  color: var(--cream);
+  border: 1px solid rgba(201,169,110,0.2);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: background 0.2s;
+  font-size: 1rem;
+}
+.cal-nav:hover { background: rgba(201,169,110,0.22); }
+
+.cal-days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.cal-day-label {
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 4px 0;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  margin-top: 10px;
+  gap: 6px;
   transition: all 0.25s ease;
 }
 
-  /* SLIDE ANIMATION */
-.calendar-grid.slide-left {
-  transform: translateX(-40px);
-  opacity: 0;
-}
-
-.calendar-grid.slide-right {
-  transform: translateX(40px);
-  opacity: 0;
-}
+.calendar-grid.slide-left  { transform: translateX(-30px); opacity: 0; }
+.calendar-grid.slide-right { transform: translateX(30px);  opacity: 0; }
 
 .day {
-  padding: 12px;
-  background: #111;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 8px;
+  font-size: 0.82rem;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .available {
-  border: 1px solid #333;
+  border: 1px solid rgba(255,255,255,0.08);
   cursor: pointer;
+  color: var(--cream);
+  transition: all 0.2s;
+}
+.available:hover {
+  border-color: var(--gold);
+  background: rgba(201,169,110,0.1);
+  color: var(--gold-lt);
 }
 
-.available:hover {
-  border-color: #fff;
+.today-day {
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
 }
 
 .booked {
-  background: #222;
-  color: #666;
+  background: rgba(255,255,255,0.02);
+  color: rgba(255,255,255,0.15);
   text-decoration: line-through;
-  opacity: 0.4;
   cursor: not-allowed;
 }
 
-/* STEPS */
+/* ── HOW IT WORKS ────────────────────────── */
 .steps {
   display: grid;
-  gap: 30px;
+  gap: 24px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+@media (min-width: 640px) {
+  .steps { grid-template-columns: repeat(3, 1fr); }
 }
 
-@media (min-width: 768px) {
-  .steps { grid-template-columns: repeat(3, 1fr); }
+.step-card {
+  padding: 32px 24px;
+  border: 1px solid rgba(201,169,110,0.1);
+  border-radius: var(--radius);
+  background: rgba(20,16,12,0.5);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  position: relative;
+  overflow: hidden;
+}
+
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  opacity: 0.5;
+}
+
+.step-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 300;
+  color: var(--gold);
+  opacity: 0.3;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.step-card h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--cream);
+  margin-bottom: 8px;
+  font-style: normal;
+}
+
+.step-card p {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ── CTA ─────────────────────────────────── */
+.cta-section {
+  padding: clamp(80px, 12vw, 140px) 24px;
+}
+.cta-inner {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.cta-inner h2 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-style: italic;
+  margin-bottom: 14px;
+}
+.cta-inner p {
+  margin-bottom: 36px;
+  font-size: 0.95rem;
+}
+.cta-buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── FOOTER ──────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 30px 20px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+footer a { color: var(--gold); text-decoration: none; }
+
+/* ── MOBILE OVERRIDES ────────────────────── */
+@media (max-width: 480px) {
+  .hero-ctas { flex-direction: column; align-items: center; }
+  .btn { width: 100%; max-width: 280px; text-align: center; }
+  .pricing-notes { padding: 14px 16px; }
+  .step-card { text-align: left; }
 }
 </style>
 </head>
 
 <body>
-
 <div class="bg-glow"></div>
 
-<!-- HERO -->
-<section class="show">
-  <h1>Hand-Drawn Portraits That Turn Your Memories Into Art</h1>
+<!-- ── HERO ── -->
+<section class="hero show">
+  <div class="hero-eyebrow">Handcrafted Portraits</div>
+  <h1>Turning Your Memories<br>Into Timeless Art</h1>
   <p>Realistic pencil sketches crafted from your photos</p>
-  <a href="https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait" class="btn">
-    Book Your Portrait
-  </a>
-</section>
-
-<!-- PORTFOLIO -->
-<section>
-  <h2>Portfolio</h2>
-  <div class="portfolio">
-    <div><img src="images/portrait1.jpg"></div>
-    <div><img src="images/portrait2.jpg"></div>
-    <div><img src="images/portrait3.jpg"></div>
-    <div><img src="images/portrait4.jpg"></div>
-    <div><img src="images/portrait5.jpg"></div>
-    <div><img src="images/portrait1.jpg"></div>
+  <div class="hero-ctas">
+    <a href="https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait" class="btn btn-primary">Book Your Portrait</a>
+    <a href="#portfolio" class="btn btn-outline">View Portfolio</a>
   </div>
 </section>
 
-<!-- PRICING -->
-<section class="dark-section">
+<!-- ── PORTFOLIO ── -->
+<section id="portfolio" class="dark-section">
+  <h2>Portfolio</h2>
+  <div class="divider"><span>✦</span></div>
+  <div class="portfolio">
+    <div class="portfolio-item" onclick="openLightbox(0)"><img src="images/portrait1.jpg" alt="Portrait 1" loading="lazy"></div>
+    <div class="portfolio-item" onclick="openLightbox(1)"><img src="images/portrait2.jpg" alt="Portrait 2" loading="lazy"></div>
+    <div class="portfolio-item" onclick="openLightbox(2)"><img src="images/portrait3.jpg" alt="Portrait 3" loading="lazy"></div>
+    <div class="portfolio-item" onclick="openLightbox(3)"><img src="images/portrait4.jpg" alt="Portrait 4" loading="lazy"></div>
+    <div class="portfolio-item" onclick="openLightbox(4)"><img src="images/portrait5.jpg" alt="Portrait 5" loading="lazy"></div>
+    <div class="portfolio-item" onclick="openLightbox(5)"><img src="images/portrait1.jpg" alt="Portrait 6" loading="lazy"></div>
+  </div>
+</section>
+
+<!-- ── LIGHTBOX ── -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+  <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">✕</button>
+  <div class="lightbox-img-wrap">
+    <button class="lightbox-btn prev" onclick="shiftLightbox(-1)" aria-label="Previous">‹</button>
+    <img id="lightbox-img" src="" alt="Portrait">
+    <button class="lightbox-btn next" onclick="shiftLightbox(1)" aria-label="Next">›</button>
+  </div>
+  <div class="lightbox-counter" id="lightbox-counter">1 / 6</div>
+</div>
+
+<!-- ── PRICING ── -->
+<section>
   <h2>Pricing</h2>
-  <p>Base price includes one person</p>
+  <div class="divider"><span>✦</span></div>
+  <p style="margin-bottom:32px;">Base price includes one person</p>
 
   <div class="pricing-split">
     <div class="price-box">
       <h3>B/W Pencil Sketch</h3>
-      <div class="row"><span>A5</span><span><span class="main-price">Starts at ₹1000</span><span class="sub-price">+₹500 / person</span></span></div>
-      <div class="row highlight"><span>A4</span><span><span class="main-price">Starts at ₹2500</span><span class="sub-price">+₹1200 / person</span></span></div>
-      <div class="row"><span>A3</span><span><span class="main-price">Starts at ₹7000</span><span class="sub-price">+₹2000 / person</span></span></div>
+      <div class="row">
+        <span class="size-label">A5</span>
+        <span class="price-info"><span class="main-price">Starts at ₹1,000</span><span class="sub-price">+₹500 / extra person</span></span>
+      </div>
+      <div class="row highlight">
+        <span class="size-label">A4</span>
+        <span class="price-info"><span class="main-price">Starts at ₹2,500</span><span class="sub-price">+₹1,200 / extra person</span></span>
+      </div>
+      <div class="row">
+        <span class="size-label">A3</span>
+        <span class="price-info"><span class="main-price">Starts at ₹7,000</span><span class="sub-price">+₹2,000 / extra person</span></span>
+      </div>
     </div>
 
     <div class="price-box">
       <h3>Colour Pencil Sketch</h3>
-      <div class="row"><span>A5</span><span><span class="main-price">Starts at ₹1500</span><span class="sub-price">+₹700 / person</span></span></div>
-      <div class="row highlight"><span>A4</span><span><span class="main-price">Starts at ₹4000</span><span class="sub-price">+₹1500 / person</span></span></div>
-      <div class="row"><span>A3</span><span><span class="main-price">Starts at ₹9000</span><span class="sub-price">+₹3000 / person</span></span></div>
+      <div class="row">
+        <span class="size-label">A5</span>
+        <span class="price-info"><span class="main-price">Starts at ₹1,500</span><span class="sub-price">+₹700 / extra person</span></span>
+      </div>
+      <div class="row highlight">
+        <span class="size-label">A4</span>
+        <span class="price-info"><span class="main-price">Starts at ₹4,000</span><span class="sub-price">+₹1,500 / extra person</span></span>
+      </div>
+      <div class="row">
+        <span class="size-label">A3</span>
+        <span class="price-info"><span class="main-price">Starts at ₹9,000</span><span class="sub-price">+₹3,000 / extra person</span></span>
+      </div>
     </div>
   </div>
 
-  <p style="margin-top:20px; font-size:14px; color:#888;">
-    • Delivery: ₹100 – ₹300 depending on location<br>
-    • Premium frames available (₹800 – ₹1500)<br>
-    • 50% advance required to start the artwork
-  </p>
+  <div class="pricing-notes" style="margin-top:24px;">
+    <p>
+      📦 &nbsp;Delivery: ₹100 – ₹300 depending on location<br>
+      🖼 &nbsp;Premium frames available: ₹800 – ₹1,500<br>
+      💳 &nbsp;50% advance required to start the artwork
+    </p>
+  </div>
 </section>
 
-<!-- AVAILABILITY -->
-<section>
+<!-- ── AVAILABILITY ── -->
+<section class="dark-section">
   <h2>Availability</h2>
-  <p>Select a date. Booked dates block the entire week.</p>
+  <div class="divider"><span>✦</span></div>
+  <p>Select a date to book via WhatsApp. Booked dates are unavailable.</p>
 
   <div class="calendar-container">
     <div class="calendar-header">
-      <button onclick="changeMonth(-1)">←</button>
+      <button class="cal-nav" onclick="changeMonth(-1)" aria-label="Previous month">‹</button>
       <h3 id="monthYear"></h3>
-      <button onclick="changeMonth(1)">→</button>
+      <button class="cal-nav" onclick="changeMonth(1)" aria-label="Next month">›</button>
+    </div>
+    <div class="cal-days-header">
+      <div class="cal-day-label">Sun</div>
+      <div class="cal-day-label">Mon</div>
+      <div class="cal-day-label">Tue</div>
+      <div class="cal-day-label">Wed</div>
+      <div class="cal-day-label">Thu</div>
+      <div class="cal-day-label">Fri</div>
+      <div class="cal-day-label">Sat</div>
     </div>
     <div class="calendar-grid" id="calendar"></div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
+<!-- ── HOW IT WORKS ── -->
 <section>
   <h2>How It Works</h2>
+  <div class="divider"><span>✦</span></div>
   <div class="steps">
-    <div><h3>01</h3><p>Submit your photo and requirements</p></div>
-    <div><h3>02</h3><p>Pay 50% advance to start your artwork</p></div>
-    <div><h3>03</h3><p>Final payment after completion, then delivery</p></div>
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <h3>Share Your Photo</h3>
+      <p>Send your favourite photo along with size and style preferences via WhatsApp or the form.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <h3>Pay the Advance</h3>
+      <p>A 50% advance confirms your slot and kickstarts the artwork creation process.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <h3>Receive Your Art</h3>
+      <p>After final payment, your portrait is carefully packed and delivered to your doorstep.</p>
+    </div>
   </div>
 </section>
 
-<!-- CTA -->
-<section>
-  <h2>Book Your Portrait Now</h2>
-  <p>Limited slots available</p>
-
-  <a href="https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait" class="btn">Book Now</a>
-  <br><br>
-  <a href="form.html" class="btn">Request via Form</a>
+<!-- ── CTA ── -->
+<section class="cta-section dark-section">
+  <div class="cta-inner">
+    <h2>Ready to Preserve a Memory?</h2>
+    <p>Limited slots available each month. Reach out today.</p>
+    <div class="cta-buttons">
+      <a href="https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait" class="btn btn-primary">Book on WhatsApp</a>
+      <a href="form.html" class="btn btn-outline">Request via Form</a>
+    </div>
+  </div>
 </section>
 
+<footer>
+  <p>© 2025 Sharan Bangera · <a href="https://wa.me/919945070481">WhatsApp</a></p>
+</footer>
+
 <script>
+/* ── JS class for animation ── */
 document.body.classList.add("js");
 
+/* ── LIGHTBOX ── */
+const images = [
+  "images/portrait1.jpg",
+  "images/portrait2.jpg",
+  "images/portrait3.jpg",
+  "images/portrait4.jpg",
+  "images/portrait5.jpg",
+  "images/portrait1.jpg"
+];
+let currentImg = 0;
+
+function openLightbox(idx) {
+  currentImg = idx;
+  updateLightbox();
+  document.getElementById("lightbox").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeLightbox() {
+  document.getElementById("lightbox").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function shiftLightbox(dir) {
+  const img = document.getElementById("lightbox-img");
+  img.style.opacity = 0;
+  setTimeout(() => {
+    currentImg = (currentImg + dir + images.length) % images.length;
+    updateLightbox();
+    img.style.opacity = 1;
+  }, 180);
+}
+
+function updateLightbox() {
+  document.getElementById("lightbox-img").src = images[currentImg];
+  document.getElementById("lightbox-counter").textContent = `${currentImg + 1} / ${images.length}`;
+}
+
+document.getElementById("lightbox").addEventListener("click", function(e) {
+  if (e.target === this) closeLightbox();
+});
+
+document.addEventListener("keydown", function(e) {
+  const lb = document.getElementById("lightbox");
+  if (!lb.classList.contains("open")) return;
+  if (e.key === "ArrowRight") shiftLightbox(1);
+  if (e.key === "ArrowLeft")  shiftLightbox(-1);
+  if (e.key === "Escape")     closeLightbox();
+});
+
+/* ── CALENDAR ── */
 let currentDate = new Date();
 let slideDirection = "left";
 
-/* CHANGE MONTH */
-function changeMonth(direction) {
-  slideDirection = direction === 1 ? "left" : "right";
-  currentDate.setMonth(currentDate.getMonth() + direction);
+function changeMonth(dir) {
+  slideDirection = dir === 1 ? "left" : "right";
+  currentDate.setMonth(currentDate.getMonth() + dir);
   renderCalendar();
 }
 
-/* RENDER CALENDAR */
 function renderCalendar() {
   const calendar = document.getElementById("calendar");
   const monthYear = document.getElementById("monthYear");
-
   if (!calendar || !monthYear) return;
 
-  // GRID slides same direction
-  calendar.classList.add(
-    slideDirection === "left" ? "slide-left" : "slide-right"
-  );
-
-  // MONTH slides opposite direction
-  monthYear.classList.add(
-    slideDirection === "left" ? "month-right" : "month-left"
-  );
+  calendar.classList.add(slideDirection === "left" ? "slide-left" : "slide-right");
+  monthYear.classList.add(slideDirection === "left" ? "month-right" : "month-left");
 
   setTimeout(() => {
     calendar.innerHTML = "";
-
-    const year = currentDate.getFullYear();
+    const year  = currentDate.getFullYear();
     const month = currentDate.getMonth();
 
-    monthYear.innerText = currentDate.toLocaleString("default", {
-      month: "long",
-      year: "numeric"
-    });
+    monthYear.innerText = currentDate.toLocaleString("default", { month: "long", year: "numeric" });
 
-    const firstDay = new Date(year, month, 1).getDay();
+    const firstDay    = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    for (let i = 0; i < firstDay; i++) {
-      calendar.innerHTML += `<div></div>`;
-    }
+    for (let i = 0; i < firstDay; i++) calendar.innerHTML += `<div></div>`;
 
     const today = new Date();
-    today.setHours(0,0,0,0);
+    today.setHours(0, 0, 0, 0);
 
     for (let day = 1; day <= daysInMonth; day++) {
       const dateObj = new Date(year, month, day);
       const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const isToday = dateObj.toDateString() === today.toDateString();
+      const isPast  = dateObj < today;
 
-      let className = "day available";
-      if (dateObj < today) className = "day booked";
+      let cls = "day";
+      if (isPast)        cls += " booked";
+      else if (isToday)  cls += " available today-day";
+      else               cls += " available";
 
-      calendar.innerHTML += `
-        <div class="${className}" onclick="selectDate('${dateStr}')">
-          ${day}
-        </div>
-      `;
+      calendar.innerHTML += `<div class="${cls}" ${!isPast ? `onclick="selectDate('${dateStr}')"` : ""}>${day}</div>`;
     }
 
-    // remove animations → slide back to center
     calendar.classList.remove("slide-left", "slide-right");
     monthYear.classList.remove("month-left", "month-right");
-
   }, 180);
 }
 
-/* DATE CLICK */
 function selectDate(date) {
-  const today = new Date();
-  const selected = new Date(date);
-  today.setHours(0,0,0,0);
-
-  if (selected < today) return;
-
-  window.open(
-    `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
-    "_blank"
-  );
+  window.open(`https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`, "_blank");
 }
 
-/* INIT */
 renderCalendar();
 
-/* PARALLAX BG */
+/* ── PARALLAX ── */
 window.addEventListener("scroll", () => {
-  const scrollY = window.scrollY;
   const bg = document.querySelector(".bg-glow");
-  if (bg) {
-    bg.style.transform = `translateY(${scrollY * 0.2}px)`;
-  }
-});
+  if (bg) bg.style.transform = `translateY(${window.scrollY * 0.18}px)`;
+}, { passive: true });
 
-/* SCROLL REVEAL */
-const sections = document.querySelectorAll("section");
+/* ── SCROLL REVEAL ── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("show"); });
+}, { threshold: 0.12 });
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add("show");
-    }
-  });
-}, { threshold: 0.15 });
-
-sections.forEach(section => observer.observe(section));
-
+document.querySelectorAll("section").forEach(s => observer.observe(s));
 </script>
-
 </body>
 </html>
