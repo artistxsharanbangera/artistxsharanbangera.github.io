@@ -167,6 +167,20 @@ p { color: #aaa; }
   align-items: center;
 }
 
+  /* MONTH TEXT ANIMATION */
+#monthYear {
+  transition: all 0.25s ease;
+}
+
+.month-left {
+  transform: translateX(-30px);
+  opacity: 0;
+}
+
+.month-right {
+  transform: translateX(30px);
+  opacity: 0;
+}
 .calendar-header button {
   background: #111;
   color: #fff;
@@ -339,9 +353,14 @@ function renderCalendar() {
 
   if (!calendar || !monthYear) return;
 
-  // APPLY SLIDE OUT
+  // GRID slides same direction
   calendar.classList.add(
     slideDirection === "left" ? "slide-left" : "slide-right"
+  );
+
+  // MONTH slides opposite direction
+  monthYear.classList.add(
+    slideDirection === "left" ? "month-right" : "month-left"
   );
 
   setTimeout(() => {
@@ -350,15 +369,14 @@ function renderCalendar() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
 
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
     monthYear.innerText = currentDate.toLocaleString("default", {
       month: "long",
       year: "numeric"
     });
 
-    // empty slots
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
     for (let i = 0; i < firstDay; i++) {
       calendar.innerHTML += `<div></div>`;
     }
@@ -371,10 +389,7 @@ function renderCalendar() {
       const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 
       let className = "day available";
-
-      if (dateObj < today) {
-        className = "day booked";
-      }
+      if (dateObj < today) className = "day booked";
 
       calendar.innerHTML += `
         <div class="${className}" onclick="selectDate('${dateStr}')">
@@ -383,8 +398,9 @@ function renderCalendar() {
       `;
     }
 
-    // REMOVE SLIDE CLASS → animates back to center
+    // remove animations → slide back to center
     calendar.classList.remove("slide-left", "slide-right");
+    monthYear.classList.remove("month-left", "month-right");
 
   }, 180);
 }
