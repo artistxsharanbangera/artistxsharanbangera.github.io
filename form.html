@@ -38,10 +38,9 @@ body {
   border: 1px solid rgba(255,255,255,0.08);
 }
 
-/* Typography */
 h1 {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 label {
@@ -52,7 +51,6 @@ label {
   color: #bbb;
 }
 
-/* Inputs */
 input, select, textarea {
   width: 100%;
   padding: 14px;
@@ -61,11 +59,21 @@ input, select, textarea {
   border: 1px solid #222;
   background: #111;
   color: #fff;
-  outline: none;
 }
 
-input:focus, select:focus, textarea:focus {
-  border-color: #555;
+/* Price Box */
+.price-preview {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.price-preview span {
+  font-size: 22px;
+  font-weight: 600;
 }
 
 /* Button */
@@ -78,7 +86,6 @@ button {
   border: none;
   font-weight: 500;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 button:hover {
@@ -94,65 +101,127 @@ button:hover {
 <div class="container">
   <h1>Request Your Portrait</h1>
 
-  <form action="https://formspree.io/f/xqeynzvq" method="POST" enctype="multipart/form-data">
+  <form id="form">
 
     <label>Your Name</label>
-    <input type="text" name="name" placeholder="Enter your name" required>
+    <input type="text" id="name" required>
 
     <label>Your Email</label>
-    <input type="email" name="email" placeholder="Enter your email" required>
+    <input type="email" id="email" required>
 
     <label>Phone Number</label>
-    <input type="tel" name="phone" placeholder="Optional">
+    <input type="tel" id="phone">
 
     <label>Type of Portrait</label>
-    <select name="type">
-      <option>B/W Pencil Sketch</option>
-      <option>Colour Pencil Sketch</option>
+    <select id="type">
+      <option value="bw">B/W Pencil Sketch</option>
+      <option value="color">Colour Pencil Sketch</option>
     </select>
 
     <label>Size</label>
-    <select name="size">
-      <option>A5</option>
-      <option>A4</option>
-      <option>A3</option>
+    <select id="size">
+      <option value="A5">A5</option>
+      <option value="A4">A4</option>
+      <option value="A3">A3</option>
     </select>
 
     <label>Number of People</label>
-    <input type="number" name="people" min="1" value="1">
+    <input type="number" id="people" min="1" value="1">
+
+    <!-- 💰 PRICE PREVIEW -->
+    <div class="price-preview">
+      Estimated Price: ₹<span id="price">1000</span>
+    </div>
 
     <label>Preferred Date</label>
-    <input type="date" name="date">
+    <input type="date" id="date">
 
     <label>What do you need?</label>
-    <select name="intent">
+    <select id="intent">
       <option>Call me</option>
       <option>Send quotation</option>
       <option>Ready to book</option>
     </select>
 
-    <label>Upload your photo</label>
-    <input type="file" name="photo" accept="image/*">
-
-    <p style="font-size:12px; color:#777;">
-      Upload a clear photo OR paste a Google Drive / WhatsApp link
-    </p>
-
-    <input type="text" name="photo_link" placeholder="Paste image link here">
+    <label>Paste Image Link</label>
+    <input type="text" id="photo" placeholder="Paste Google Drive / WhatsApp link">
 
     <label>Additional Details</label>
-    <textarea name="notes" placeholder="Anything else you'd like to mention..."></textarea>
+    <textarea id="notes"></textarea>
 
-    <button type="submit">Submit Request</button>
+    <button type="submit">Continue to WhatsApp</button>
 
   </form>
 
-  <p style="text-align:center; font-size:12px; color:#777; margin-top:15px;">
-    Prefer quick booking? 
-    <a href="https://wa.me/919945070481" style="color:#fff;">Message on WhatsApp</a>
-  </p>
-
 </div>
+
+<script>
+/* 💰 PRICE CALCULATOR */
+
+function calculatePrice() {
+  const type = document.getElementById("type").value;
+  const size = document.getElementById("size").value;
+  const people = parseInt(document.getElementById("people").value) || 1;
+
+  let base = 0;
+  let extra = 0;
+
+  if (type === "bw") {
+    if (size === "A5") { base = 1000; extra = 500; }
+    if (size === "A4") { base = 2500; extra = 1200; }
+    if (size === "A3") { base = 7000; extra = 2000; }
+  }
+
+  if (type === "color") {
+    if (size === "A5") { base = 1500; extra = 700; }
+    if (size === "A4") { base = 4000; extra = 1500; }
+    if (size === "A3") { base = 9000; extra = 3000; }
+  }
+
+  const total = base + (people - 1) * extra;
+  document.getElementById("price").innerText = total;
+}
+
+document.querySelectorAll("#type, #size, #people").forEach(el => {
+  el.addEventListener("change", calculatePrice);
+});
+
+calculatePrice();
+
+/* 🚀 WHATSAPP REDIRECT */
+
+document.getElementById("form").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const type = document.getElementById("type").value;
+  const size = document.getElementById("size").value;
+  const people = document.getElementById("people").value;
+  const date = document.getElementById("date").value;
+  const price = document.getElementById("price").innerText;
+  const photo = document.getElementById("photo").value;
+  const notes = document.getElementById("notes").value;
+
+  const message = 
+`Hi, I want to book a portrait.
+
+Name: ${name}
+Type: ${type}
+Size: ${size}
+People: ${people}
+Date: ${date}
+
+Estimated Price: ₹${price}
+
+Photo: ${photo}
+
+Notes: ${notes}`;
+
+  const url = `https://wa.me/919945070481?text=${encodeURIComponent(message)}`;
+
+  window.open(url, "_blank");
+});
+</script>
 
 </body>
 </html>
