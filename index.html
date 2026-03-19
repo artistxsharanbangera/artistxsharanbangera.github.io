@@ -349,7 +349,96 @@ p { color: #aaa; }
 </section>
 
 <script>
-// (same JS unchanged)
+let currentDate = new Date();
+
+function renderCalendar() {
+  const calendar = document.getElementById("calendar");
+  const monthYear = document.getElementById("monthYear");
+
+  if (!calendar) return;
+
+  calendar.classList.add("fade");
+
+  setTimeout(() => {
+    calendar.innerHTML = "";
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    monthYear.innerText = currentDate.toLocaleString("default", {
+      month: "long",
+      year: "numeric"
+    });
+
+    for (let i = 0; i < firstDay; i++) {
+      calendar.innerHTML += `<div></div>`;
+    }
+
+    function selectDate(date) {
+      const today = new Date();
+      const selected = new Date(date);
+      today.setHours(0,0,0,0);
+
+      if (selected < today) return;
+
+      window.open(
+        `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
+        "_blank"
+      );
+    }
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateObj = new Date(year, month, day);
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+
+      let className = "day available";
+
+      if (dateObj < today) {
+        className = "day booked";
+      }
+
+      calendar.innerHTML += `
+        <div class="${className}" onclick="selectDate('${dateStr}')">
+          ${day}
+        </div>
+      `;
+    }
+
+    calendar.classList.remove("fade");
+  }, 200);
+}
+
+function changeMonth(direction) {
+  currentDate.setMonth(currentDate.getMonth() + direction);
+  renderCalendar();
+}
+
+renderCalendar();
+
+/* PARALLAX */
+window.addEventListener("scroll", () => {
+  const scrollY = window.scrollY;
+  document.querySelector(".bg-glow").style.transform = `translateY(${scrollY * 0.2}px)`;
+});
+
+/* SCROLL REVEAL */
+const sections = document.querySelectorAll("section");
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("show");
+    }
+  });
+}, { threshold: 0.15 });
+
+sections.forEach(section => observer.observe(section));
 </script>
 
 </body>
