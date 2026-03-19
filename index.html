@@ -38,7 +38,6 @@ section {
   opacity: 0;
   transform: translateY(40px);
   transition: 0.8s;
-  backdrop-filter: blur(2px);
 }
 
 section.show {
@@ -313,6 +312,22 @@ p { color: #aaa; }
   </p>
 </section>
 
+<!-- AVAILABILITY -->
+<section>
+  <h2>Availability</h2>
+  <p>Select a date. Booked dates block the entire week.</p>
+
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <button onclick="changeMonth(-1)">←</button>
+      <h3 id="monthYear"></h3>
+      <button onclick="changeMonth(1)">→</button>
+    </div>
+
+    <div class="calendar-grid" id="calendar"></div>
+  </div>
+</section>
+
 <!-- HOW IT WORKS -->
 <section>
   <h2>How It Works</h2>
@@ -357,61 +372,55 @@ function renderCalendar() {
 
   if (!calendar) return;
 
-  calendar.classList.add("fade");
+  calendar.innerHTML = "";
 
-  setTimeout(() => {
-    calendar.innerHTML = "";
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
 
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+  monthYear.innerText = currentDate.toLocaleString("default", {
+    month: "long",
+    year: "numeric"
+  });
 
-    monthYear.innerText = currentDate.toLocaleString("default", {
-      month: "long",
-      year: "numeric"
-    });
+  for (let i = 0; i < firstDay; i++) {
+    calendar.innerHTML += `<div></div>`;
+  }
 
-    for (let i = 0; i < firstDay; i++) {
-      calendar.innerHTML += `<div></div>`;
-    }
-
-    function selectDate(date) {
-      const today = new Date();
-      const selected = new Date(date);
-      today.setHours(0,0,0,0);
-
-      if (selected < today) return;
-
-      window.open(
-        `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
-        "_blank"
-      );
-    }
-
+  function selectDate(date) {
     const today = new Date();
+    const selected = new Date(date);
     today.setHours(0,0,0,0);
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateObj = new Date(year, month, day);
-      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    if (selected < today) return;
 
-      let className = "day available";
+    window.open(
+      `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
+      "_blank"
+    );
+  }
 
-      if (dateObj < today) {
-        className = "day booked";
-      }
+  const today = new Date();
+  today.setHours(0,0,0,0);
 
-      calendar.innerHTML += `
-        <div class="${className}" onclick="selectDate('${dateStr}')">
-          ${day}
-        </div>
-      `;
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateObj = new Date(year, month, day);
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+
+    let className = "day available";
+
+    if (dateObj < today) {
+      className = "day booked";
     }
 
-    calendar.classList.remove("fade");
-  }, 200);
+    calendar.innerHTML += `
+      <div class="${className}" onclick="selectDate('${dateStr}')">
+        ${day}
+      </div>
+    `;
+  }
 }
 
 function changeMonth(direction) {
