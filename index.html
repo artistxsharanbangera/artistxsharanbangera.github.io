@@ -366,6 +366,20 @@ window.addEventListener("scroll", () => {
   const scrollY = window.scrollY;
   document.querySelector(".bg-glow").style.transform = `translateY(${scrollY * 0.2}px)`;
 });
+
+/* SCROLL REVEAL FIX */
+const sections = document.querySelectorAll("section");
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("show");
+    }
+  });
+}, { threshold: 0.15 });
+
+sections.forEach(section => observer.observe(section));
+  
 </script>
 
 </body>
