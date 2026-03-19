@@ -176,7 +176,18 @@ p { color: #aaa; }
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
   margin-top: 10px;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: all 0.25s ease;
+}
+
+  /* SLIDE ANIMATION */
+.calendar-grid.slide-left {
+  transform: translateX(-40px);
+  opacity: 0;
+}
+
+.calendar-grid.slide-right {
+  transform: translateX(40px);
+  opacity: 0;
 }
 
 .day {
@@ -307,14 +318,26 @@ p { color: #aaa; }
 document.body.classList.add("js");
 
 let currentDate = new Date();
+let slideDirection = "left";
 
+/* CHANGE MONTH */
+function changeMonth(direction) {
+  slideDirection = direction === 1 ? "left" : "right";
+  currentDate.setMonth(currentDate.getMonth() + direction);
+  renderCalendar();
+}
+
+/* RENDER CALENDAR */
 function renderCalendar() {
   const calendar = document.getElementById("calendar");
   const monthYear = document.getElementById("monthYear");
 
   if (!calendar || !monthYear) return;
 
-  calendar.style.opacity = "0";
+  // APPLY SLIDE OUT
+  calendar.classList.add(
+    slideDirection === "left" ? "slide-left" : "slide-right"
+  );
 
   setTimeout(() => {
     calendar.innerHTML = "";
@@ -330,6 +353,7 @@ function renderCalendar() {
       year: "numeric"
     });
 
+    // empty slots
     for (let i = 0; i < firstDay; i++) {
       calendar.innerHTML += `<div></div>`;
     }
@@ -342,7 +366,10 @@ function renderCalendar() {
       const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 
       let className = "day available";
-      if (dateObj < today) className = "day booked";
+
+      if (dateObj < today) {
+        className = "day booked";
+      }
 
       calendar.innerHTML += `
         <div class="${className}" onclick="selectDate('${dateStr}')">
@@ -351,10 +378,13 @@ function renderCalendar() {
       `;
     }
 
-    calendar.style.opacity = "1";
-  }, 150);
+    // REMOVE SLIDE CLASS → animates back to center
+    calendar.classList.remove("slide-left", "slide-right");
+
+  }, 180);
 }
 
+/* DATE CLICK */
 function selectDate(date) {
   const today = new Date();
   const selected = new Date(date);
@@ -368,17 +398,16 @@ function selectDate(date) {
   );
 }
 
-function changeMonth(direction) {
-  currentDate.setMonth(currentDate.getMonth() + direction);
-  renderCalendar();
-}
-
+/* INIT */
 renderCalendar();
 
-/* PARALLAX */
+/* PARALLAX BG */
 window.addEventListener("scroll", () => {
   const scrollY = window.scrollY;
-  document.querySelector(".bg-glow").style.transform = `translateY(${scrollY * 0.2}px)`;
+  const bg = document.querySelector(".bg-glow");
+  if (bg) {
+    bg.style.transform = `translateY(${scrollY * 0.2}px)`;
+  }
 });
 
 /* SCROLL REVEAL */
@@ -393,6 +422,7 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 
 sections.forEach(section => observer.observe(section));
+
 </script>
 
 </body>
