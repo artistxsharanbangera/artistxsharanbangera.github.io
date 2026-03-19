@@ -35,6 +35,12 @@ body {
 
   transition: transform 0.2s ease-out;
 }
+  .dark-section {
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
 
 /* SECTION */
 section {
@@ -109,8 +115,9 @@ p { color: #aaa; }
 }
 
 .price-box {
-  background: #111;
-  border: 1px solid #222;
+  background: rgba(20,20,20,0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
   padding: 30px;
   border-radius: 20px;
 }
@@ -215,7 +222,7 @@ p { color: #aaa; }
 </section>
 
 <!-- PRICING -->
-<section style="background:#0a0a0a;">
+<section class="dark-section">
   <h2>Pricing</h2>
   <p>Base price includes one person</p>
 
