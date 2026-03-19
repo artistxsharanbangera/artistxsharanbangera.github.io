@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request a Portrait</title>
+
+<style>
+body {
+  background: #000;
+  color: #fff;
+  font-family: -apple-system, sans-serif;
+  padding: 40px 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #222;
+  background: #111;
+  color: #fff;
+}
+
+button {
+  width: 100%;
+  padding: 16px;
+  background: #fff;
+  color: #000;
+  border-radius: 999px;
+  border: none;
+  font-weight: 500;
+}
+
+button:hover {
+  background: #ddd;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Request Your Portrait</h1>
+
+  <form action="https://formspree.io/f/xqeynzvq" method="POST">
+
+    <input type="text" name="name" placeholder="Your Name" required>
+
+    <input type="email" name="email" placeholder="Your Email" required>
+
+    <input type="tel" name="phone" placeholder="Phone Number">
+
+    <label>Type of Portrait</label>
+    <select name="type">
+      <option>B/W Pencil Sketch</option>
+      <option>Colour Pencil Sketch</option>
+    </select>
+
+    <label>Size</label>
+    <select name="size">
+      <option>A5</option>
+      <option>A4</option>
+      <option>A3</option>
+    </select>
+
+    <label>Number of People</label>
+    <input type="number" name="people" min="1" value="1">
+
+    <label>Preferred Date</label>
+    <input type="date" name="date">
+
+    <label>What do you need?</label>
+    <select name="intent">
+      <option>Call me</option>
+      <option>Send quotation</option>
+      <option>Ready to book</option>
+    </select>
+
+    <textarea name="notes" placeholder="Additional details..."></textarea>
+
+    <button type="submit">Submit Request</button>
+
+  </form>
+</div>
+
+</body>
+</html>
