@@ -202,6 +202,11 @@ p { color: #aaa; }
   text-decoration: line-through;
 }
 
+.day.booked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* STEPS */
 .steps {
   display: grid;
@@ -380,6 +385,21 @@ function renderCalendar() {
     for (let i = 0; i < firstDay; i++) {
       calendar.innerHTML += `<div></div>`;
     }
+
+    function selectDate(date) {
+  const today = new Date();
+  const selected = new Date(date);
+
+  today.setHours(0,0,0,0);
+
+  // block past dates
+  if (selected < today) return;
+
+  window.open(
+    `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
+    "_blank"
+  );
+}
 
     const today = new Date();
 today.setHours(0,0,0,0);
