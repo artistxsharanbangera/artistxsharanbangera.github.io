@@ -31,16 +31,22 @@ body {
   transition: transform 0.2s ease-out;
 }
 
-/* SECTION */
+/* SECTION (SAFE DEFAULT) */
 section {
   padding: 100px 20px;
   text-align: center;
-  opacity: 0;
-  transform: translateY(40px);
+  opacity: 1;
+  transform: none;
   transition: 0.8s;
 }
 
-section.show {
+/* ONLY animate when JS is active */
+.js section {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.js section.show {
   opacity: 1;
   transform: translateY(0);
 }
@@ -170,12 +176,7 @@ p { color: #aaa; }
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
   margin-top: 10px;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.calendar-grid.fade {
-  opacity: 0;
-  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .day {
@@ -197,9 +198,6 @@ p { color: #aaa; }
   background: #222;
   color: #666;
   text-decoration: line-through;
-}
-
-.day.booked {
   opacity: 0.4;
   cursor: not-allowed;
 }
@@ -250,58 +248,16 @@ p { color: #aaa; }
   <div class="pricing-split">
     <div class="price-box">
       <h3>B/W Pencil Sketch</h3>
-
-      <div class="row">
-        <span>A5</span>
-        <span>
-          <span class="main-price">Starts at ₹1000</span>
-          <span class="sub-price">+₹500 / person</span>
-        </span>
-      </div>
-
-      <div class="row highlight">
-        <span>A4</span>
-        <span>
-          <span class="main-price">Starts at ₹2500</span>
-          <span class="sub-price">+₹1200 / person</span>
-        </span>
-      </div>
-
-      <div class="row">
-        <span>A3</span>
-        <span>
-          <span class="main-price">Starts at ₹7000</span>
-          <span class="sub-price">+₹2000 / person</span>
-        </span>
-      </div>
+      <div class="row"><span>A5</span><span><span class="main-price">Starts at ₹1000</span><span class="sub-price">+₹500 / person</span></span></div>
+      <div class="row highlight"><span>A4</span><span><span class="main-price">Starts at ₹2500</span><span class="sub-price">+₹1200 / person</span></span></div>
+      <div class="row"><span>A3</span><span><span class="main-price">Starts at ₹7000</span><span class="sub-price">+₹2000 / person</span></span></div>
     </div>
 
     <div class="price-box">
       <h3>Colour Pencil Sketch</h3>
-
-      <div class="row">
-        <span>A5</span>
-        <span>
-          <span class="main-price">Starts at ₹1500</span>
-          <span class="sub-price">+₹700 / person</span>
-        </span>
-      </div>
-
-      <div class="row highlight">
-        <span>A4</span>
-        <span>
-          <span class="main-price">Starts at ₹4000</span>
-          <span class="sub-price">+₹1500 / person</span>
-        </span>
-      </div>
-
-      <div class="row">
-        <span>A3</span>
-        <span>
-          <span class="main-price">Starts at ₹9000</span>
-          <span class="sub-price">+₹3000 / person</span>
-        </span>
-      </div>
+      <div class="row"><span>A5</span><span><span class="main-price">Starts at ₹1500</span><span class="sub-price">+₹700 / person</span></span></div>
+      <div class="row highlight"><span>A4</span><span><span class="main-price">Starts at ₹4000</span><span class="sub-price">+₹1500 / person</span></span></div>
+      <div class="row"><span>A3</span><span><span class="main-price">Starts at ₹9000</span><span class="sub-price">+₹3000 / person</span></span></div>
     </div>
   </div>
 
@@ -323,7 +279,6 @@ p { color: #aaa; }
       <h3 id="monthYear"></h3>
       <button onclick="changeMonth(1)">→</button>
     </div>
-
     <div class="calendar-grid" id="calendar"></div>
   </div>
 </section>
@@ -332,18 +287,9 @@ p { color: #aaa; }
 <section>
   <h2>How It Works</h2>
   <div class="steps">
-    <div>
-      <h3>01</h3>
-      <p>Submit your photo and requirements</p>
-    </div>
-    <div>
-      <h3>02</h3>
-      <p>Pay 50% advance to start your artwork</p>
-    </div>
-    <div>
-      <h3>03</h3>
-      <p>Final payment after completion, then delivery</p>
-    </div>
+    <div><h3>01</h3><p>Submit your photo and requirements</p></div>
+    <div><h3>02</h3><p>Pay 50% advance to start your artwork</p></div>
+    <div><h3>03</h3><p>Final payment after completion, then delivery</p></div>
   </div>
 </section>
 
@@ -352,34 +298,25 @@ p { color: #aaa; }
   <h2>Book Your Portrait Now</h2>
   <p>Limited slots available</p>
 
-  <a href="https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait" class="btn">
-    Book Now
-  </a>
-
+  <a href="https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait" class="btn">Book Now</a>
   <br><br>
-
-  <a href="form.html" class="btn">
-    Request via Form
-  </a>
+  <a href="form.html" class="btn">Request via Form</a>
 </section>
 
 <script>
-let currentDate = new Date();
+document.body.classList.add("js");
 
-let calendarTimeout; // add this above the function
+let currentDate = new Date();
 
 function renderCalendar() {
   const calendar = document.getElementById("calendar");
   const monthYear = document.getElementById("monthYear");
 
-  if (!calendar) return;
+  if (!calendar || !monthYear) return;
 
-  // clear any previous animation (prevents glitch on fast clicks)
-  clearTimeout(calendarTimeout);
+  calendar.style.opacity = "0";
 
-  calendar.classList.add("fade");
-
-  calendarTimeout = setTimeout(() => {
+  setTimeout(() => {
     calendar.innerHTML = "";
 
     const year = currentDate.getFullYear();
@@ -397,19 +334,6 @@ function renderCalendar() {
       calendar.innerHTML += `<div></div>`;
     }
 
-    function selectDate(date) {
-      const today = new Date();
-      const selected = new Date(date);
-      today.setHours(0,0,0,0);
-
-      if (selected < today) return;
-
-      window.open(
-        `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
-        "_blank"
-      );
-    }
-
     const today = new Date();
     today.setHours(0,0,0,0);
 
@@ -418,10 +342,7 @@ function renderCalendar() {
       const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 
       let className = "day available";
-
-      if (dateObj < today) {
-        className = "day booked";
-      }
+      if (dateObj < today) className = "day booked";
 
       calendar.innerHTML += `
         <div class="${className}" onclick="selectDate('${dateStr}')">
@@ -430,30 +351,21 @@ function renderCalendar() {
       `;
     }
 
-    calendar.classList.remove("fade");
-
-  }, 200);
+    calendar.style.opacity = "1";
+  }, 150);
 }
 
+function selectDate(date) {
   const today = new Date();
+  const selected = new Date(date);
   today.setHours(0,0,0,0);
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dateObj = new Date(year, month, day);
-    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  if (selected < today) return;
 
-    let className = "day available";
-
-    if (dateObj < today) {
-      className = "day booked";
-    }
-
-    calendar.innerHTML += `
-      <div class="${className}" onclick="selectDate('${dateStr}')">
-        ${day}
-      </div>
-    `;
-  }
+  window.open(
+    `https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait%20on%20${date}`,
+    "_blank"
+  );
 }
 
 function changeMonth(direction) {
