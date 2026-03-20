@@ -868,7 +868,7 @@ async function fetchRates() {
   updatePrice();
 
   try {
-    const res = await fetch("/functions/shiprocket_rates", {
+    const res = await fetch("/shiprocket_rates", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ pincode: pin, size: selectedSize, frame: selectedFrame }),
@@ -1128,7 +1128,7 @@ async function handleUpload(input) {
       reader.readAsDataURL(file);
     });
 
-    const res = await fetch("/functions/imgbb_upload", {
+    const res = await fetch("/imgbb_upload", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image: base64, name: file.name }),
