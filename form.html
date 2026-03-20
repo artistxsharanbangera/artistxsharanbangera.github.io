@@ -846,6 +846,76 @@ function updateFrameDescs() {
   if (p) p.textContent = `Designer frame · +₹${framePrices.premium[selectedSize].toLocaleString("en-IN")}`;
 }
 
+let selectedCourier = null;
+
+async function fetchRates() {
+  const pin  = document.getElementById("pincode").value.trim();
+  const el   = document.getElementById("deliveryEstimate");
+  const list = document.getElementById("courierList");
+
+  if (!/^\d{6}$/.test(pin)) {
+    el.className = "delivery-estimate delivery-err";
+    el.textContent = "Please enter a valid 6-digit pincode";
+    return;
+  }
+
+  el.className = "delivery-estimate";
+  el.innerHTML = `<span style="color:var(--muted)">⏳ Fetching live rates...</span>`;
+  list.style.display = "none";
+  list.innerHTML = "";
+  selectedCourier = null;
+  deliveryCharge = 0;
+  updatePrice();
+
+  try {
+    const res = await fetch("/.netlify/functions/shiprocket-rates", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pincode: pin, size: selectedSize, frame: selectedFrame }),
+    });
+
+    const data = await res.json();
+
+    if (data.error || !data.couriers || data.couriers.length === 0) {
+      el.className = "delivery-estimate delivery-err";
+      el.textContent = data.error || "No couriers available for this pincode";
+      return;
+    }
+
+    el.textContent = "";
+    list.style.display = "block";
+    list.innerHTML = `
+      <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Select a courier</div>
+      ${data.couriers.map(c => `
+        <div class="courier-opt" onclick="selectCourier(this, ${c.rate}, '${c.name}')" data-rate="${c.rate}">
+          <span class="courier-name">${c.name}</span>
+          <span class="courier-meta">${c.etd}</span>
+          <span class="courier-price">₹${c.rate}</span>
+        </div>
+      `).join("")}
+    `;
+
+    // auto-select cheapest
+    const first = list.querySelector(".courier-opt");
+    if (first) first.click();
+
+  } catch (err) {
+    el.className = "delivery-estimate delivery-err";
+    el.textContent = "Could not fetch rates. Please try again.";
+    console.error(err);
+  }
+}
+
+function selectCourier(el, rate, name) {
+  document.querySelectorAll(".courier-opt").forEach(e => e.classList.remove("selected"));
+  el.classList.add("selected");
+  deliveryCharge = rate;
+  selectedCourier = name;
+  const lineEl = document.getElementById("deliveryLine");
+  if (lineEl) lineEl.textContent = `+ ₹${rate} delivery (${name})`;
+  updatePrice();
+}
+
 function estimateDelivery() {
   const pin   = (document.getElementById("pincode") || {value:""}).value.trim();
   const el    = document.getElementById("deliveryEstimate");
