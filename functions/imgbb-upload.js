@@ -1,6 +1,16 @@
 // functions/imgbb-upload.js
 // Cloudflare Pages Function — proxies ImgBB uploads
 
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function onRequestOptions() {
+  return new Response(null, { status: 204, headers: CORS });
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -8,7 +18,7 @@ export async function onRequestPost(context) {
     const body = await request.json();
 
     if (!body.image) {
-      return Response.json({ error: "No image provided" }, { status: 400 });
+      return Response.json({ error: "No image provided" }, { status: 400, headers: CORS });
     }
 
     const params = new URLSearchParams({
@@ -25,13 +35,13 @@ export async function onRequestPost(context) {
     const data = await res.json();
 
     if (!data.success) {
-      return Response.json({ error: "ImgBB upload failed" }, { status: 502 });
+      return Response.json({ error: "ImgBB upload failed" }, { status: 502, headers: CORS });
     }
 
-    return Response.json({ url: data.data.url });
+    return Response.json({ url: data.data.url }, { headers: CORS });
 
   } catch (err) {
     console.error("ImgBB error:", err);
-    return Response.json({ error: "Upload failed" }, { status: 500 });
+    return Response.json({ error: "Upload failed" }, { status: 500, headers: CORS });
   }
 }
