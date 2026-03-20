@@ -241,6 +241,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
+.size-opt[data-size="custom"] {
+  grid-column: 1 / -1;
+  max-width: 140px;
+  margin: 4px auto 0;
+  width: 100%;
+  padding: 10px 8px;
+}
+.size-options {
+  margin-bottom: 18px;
+}
 
 .size-opt {
   border: 1px solid rgba(201,169,110,0.15);
@@ -610,11 +620,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <span class="size-dims">29.7 × 42 cm</span>
             <span class="size-price" id="sp-A3">from ₹7,000</span>
           </div>
+          <div class="size-opt" data-size="custom" onclick="selectSize(this)">
+            <span class="size-name">Custom</span>
+            <span class="size-dims">Any size you want</span>
+            <span class="size-price" id="sp-custom">Quote on request</span>
+          </div>
         </div>
-      </div>
-
-      <div class="field-group">
-        <label>Frame</label>
+        <div id="customSizeField" style="display:none; margin-top:12px; margin-bottom:18px;">
+          <input type="text" id="customSizeDims" placeholder="e.g. A2 (42 × 59.4 cm) or 50 × 70 cm or 24 × 36 inches"
+            style="width:100%; padding:12px 14px; background:rgba(201,169,110,0.07); border:1px solid rgba(201,169,110,0.25); border-radius:10px; color:var(--cream); font-size:0.88rem; outline:none;"
+            oninput="document.getElementById('customSizeHidden').value=this.value">
+          <input type="hidden" id="customSizeHidden" name="customSize">
+          <p style="font-size:0.72rem; color:var(--muted); margin-top:6px;">Pricing will be shared after reviewing your requirements.</p>
+        </div>
         <div class="type-options" style="grid-template-columns:repeat(3,1fr);">
           <div class="type-opt selected" data-frame="none" onclick="selectFrame(this)">
             <span class="type-name">No Frame</span>
@@ -868,7 +886,7 @@ async function fetchRates() {
   updatePrice();
 
   try {
-    const res = await fetch("/shiprocket_rates", {
+    const res = await fetch("/functions/shiprocket-rates", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ pincode: pin, size: selectedSize, frame: selectedFrame }),
@@ -945,9 +963,19 @@ function selectSize(el) {
   document.querySelectorAll(".size-opt").forEach(e => e.classList.remove("selected"));
   el.classList.add("selected");
   selectedSize = el.dataset.size;
-  updatePrice();
-  updateSizePriceLabels();
-  updateFrameDescs();
+  const customField = document.getElementById("customSizeField");
+  if (selectedSize === "custom") {
+    customField.style.display = "block";
+    document.getElementById("price").textContent = "—";
+    document.getElementById("priceBreakdown").textContent = "Price on request";
+    const lineEl = document.getElementById("deliveryLine");
+    if (lineEl) lineEl.textContent = "";
+  } else {
+    customField.style.display = "none";
+    updatePrice();
+    updateSizePriceLabels();
+    updateFrameDescs();
+  }
 }
 
 function changePeople(dir) {
@@ -957,6 +985,7 @@ function changePeople(dir) {
 }
 
 function updatePrice() {
+  if (selectedSize === "custom") return;
   const [base, extra] = prices[selectedType][selectedSize];
   const frameAmt = framePrices[selectedFrame][selectedSize];
   const artTotal = base + (people - 1) * extra + frameAmt;
@@ -1007,12 +1036,18 @@ function goStep(n) {
 /* ── SUMMARY ── */
 function buildSummary() {
   const typeLabel = selectedType === "bw" ? "B/W Pencil Sketch" : "Colour Pencil Sketch";
-  const [base, extra] = prices[selectedType][selectedSize];
-  const total = base + (people - 1) * extra;
+  const isCustom = selectedSize === "custom";
+  const customDims = document.getElementById("customSizeDims")?.value || "";
 
-  const frameAmt   = framePrices[selectedFrame][selectedSize];
-  const artTotal   = base + (people - 1) * extra + frameAmt;
-  const grandTotal = artTotal + deliveryCharge;
+  const sizeLabel = isCustom
+    ? `Custom${customDims ? " — " + customDims : ""}`
+    : `${selectedSize} (${selectedSize==="A5"?"14.8×21":selectedSize==="A4"?"21×29.7":"29.7×42"} cm)`;
+
+  const grandTotal = isCustom ? null : (() => {
+    const [base, extra] = prices[selectedType][selectedSize];
+    const frameAmt = framePrices[selectedFrame][selectedSize];
+    return base + (people - 1) * extra + frameAmt + deliveryCharge;
+  })();
 
   const rows = [
     ["Name",     document.getElementById("name").value],
@@ -1022,7 +1057,7 @@ function buildSummary() {
     ["Date",     document.getElementById("date").value || "—"],
     ["Intent",   document.getElementById("intent").value],
     ["Type",     typeLabel],
-    ["Size",     `${selectedSize} (${selectedSize==="A5"?"14.8×21":selectedSize==="A4"?"21×29.7":"29.7×42"} cm)`],
+    ["Size",     sizeLabel],
     ["People",   people],
     ["Frame",    frameLabel(selectedFrame)],
     ["Delivery", deliveryCharge > 0 ? `₹${deliveryCharge}` : "TBD (enter pincode)"],
@@ -1038,7 +1073,7 @@ function buildSummary() {
   `).join("") + `
     <div class="summary-row summary-total" style="margin-top:12px;padding-top:16px;border-top:1px solid rgba(201,169,110,0.15);border-bottom:none;">
       <span class="summary-key">Estimated Total</span>
-      <span class="summary-val">₹${grandTotal.toLocaleString("en-IN")}</span>
+      <span class="summary-val">${grandTotal ? "₹" + grandTotal.toLocaleString("en-IN") : "Price on request"}</span>
     </div>
   `;
 
@@ -1053,8 +1088,13 @@ const EJS_KEY      = "tQLS0ptq32eiYbTGd";
 /* ── SUBMIT ── */
 async function submitForm() {
   const typeLabel = selectedType === "bw" ? "B/W Pencil Sketch" : "Colour Pencil Sketch";
-  const [base, extra] = prices[selectedType][selectedSize];
-  const total = base + (people - 1) * extra;
+  const isCustom = selectedSize === "custom";
+  const customDims = document.getElementById("customSizeDims")?.value || "";
+  const sizeLabel = isCustom ? `Custom${customDims ? " — " + customDims : ""}` : selectedSize;
+  const total = isCustom ? "Price on request" : (() => {
+    const [base, extra] = prices[selectedType][selectedSize];
+    return (base + (people - 1) * extra).toLocaleString("en-IN");
+  })();
 
   const submitBtn = document.getElementById("submitBtn");
   submitBtn.disabled = true;
@@ -1069,9 +1109,9 @@ async function submitForm() {
       date:     document.getElementById("date").value || "—",
       intent:   document.getElementById("intent").value,
       type:     typeLabel,
-      size:     selectedSize,
+      size:     sizeLabel,
       people:   people,
-      price:    total.toLocaleString("en-IN"),
+      price:    total,
       photo:    document.getElementById("photo").value || "—",
       notes:    document.getElementById("notes").value || "—",
       frame:    frameLabel(selectedFrame),
@@ -1128,7 +1168,7 @@ async function handleUpload(input) {
       reader.readAsDataURL(file);
     });
 
-    const res = await fetch("/imgbb_upload", {
+    const res = await fetch("/functions/imgbb-upload", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image: base64, name: file.name }),
