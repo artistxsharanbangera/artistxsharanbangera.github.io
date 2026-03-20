@@ -992,22 +992,34 @@ async function submitForm() {
   submitBtn.textContent = "Sending...";
 
   try {
-    await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, {
-      name:    document.getElementById("name").value,
-      phone:   document.getElementById("phone").value,
-      email:   document.getElementById("email").value || "—",
-      address: document.getElementById("address").value || "—",
-      date:    document.getElementById("date").value || "—",
-      intent: document.getElementById("intent").value,
-      type:   typeLabel,
-      size:   selectedSize,
-      people: people,
-      price:  total.toLocaleString("en-IN"),
-      photo:  document.getElementById("photo").value || "—",
+    const formPayload = {
+      name:     document.getElementById("name").value,
+      phone:    document.getElementById("phone").value,
+      email:    document.getElementById("email").value || "—",
+      address:  document.getElementById("address").value || "—",
+      date:     document.getElementById("date").value || "—",
+      intent:   document.getElementById("intent").value,
+      type:     typeLabel,
+      size:     selectedSize,
+      people:   people,
+      price:    total.toLocaleString("en-IN"),
+      photo:    document.getElementById("photo").value || "—",
       notes:    document.getElementById("notes").value || "—",
       frame:    frameLabel(selectedFrame),
       delivery: deliveryCharge > 0 ? `₹${deliveryCharge}` : "TBD",
-    }, EJS_KEY);
+      courier:  selectedCourier || "TBD",
+    };
+
+    // Submit to Netlify Forms
+    const netlifyBody = new URLSearchParams({ "form-name": "portrait-request", ...formPayload });
+    await fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: netlifyBody.toString(),
+    });
+
+    // Send EmailJS notification
+    await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, formPayload, EJS_KEY);
 
     // show success state
     document.querySelector(".form-card").innerHTML = `
