@@ -3,230 +3,820 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Request a Portrait</title>
+<title>Request a Portrait · Artist X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
+:root {
+  --cream:   #f5ede0;
+  --gold:    #c9a96e;
+  --gold-lt: #e2c998;
+  --ink:     #0e0b08;
+  --ink2:    #1a1410;
+  --muted:   #8a7d6e;
+  --radius:  14px;
+  --border:  rgba(201,169,110,0.15);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
 body {
-  margin: 0;
-  font-family: -apple-system, sans-serif;
-  color: #fff;
-  background: #000;
-  padding: 40px 20px;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--ink);
+  color: var(--cream);
+  min-height: 100svh;
+  overflow-x: hidden;
 }
 
-/* Background */
-.bg-glow {
+/* ── CANVAS ── */
+#bgCanvas {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url("images/bg.jpg") center/cover no-repeat;
-  opacity: 0.25;
-  filter: blur(2px);
+  inset: 0;
+  width: 100%; height: 100%;
   z-index: -1;
+  pointer-events: none;
 }
 
-/* Container */
-.container {
-  max-width: 600px;
-  margin: auto;
-  background: rgba(20,20,20,0.6);
-  backdrop-filter: blur(10px);
-  padding: 30px;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.08);
+/* ── NAV ── */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px clamp(20px, 5vw, 60px);
+  background: rgba(8,6,4,0.7);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-h1 {
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--cream);
+  text-decoration: none;
+}
+
+.nav-back {
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-back:hover { color: var(--gold); }
+
+/* ── PAGE LAYOUT ── */
+.page {
+  padding: clamp(40px, 7vw, 80px) clamp(20px, 5vw, 40px);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.page-header {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 48px;
 }
+
+.eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+
+.page-header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.15;
+  color: var(--cream);
+}
+
+.page-header p {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* ── FORM CARD ── */
+.form-card {
+  background: rgba(18,13,9,0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: clamp(24px, 5vw, 44px);
+}
+
+/* ── STEPS INDICATOR ── */
+.steps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 40px;
+}
+
+.step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.step-dot .dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.25);
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: 'Cormorant Garamond', serif;
+  transition: all 0.3s;
+}
+
+.step-dot.active .dot {
+  border-color: var(--gold);
+  background: rgba(201,169,110,0.12);
+  color: var(--gold-lt);
+}
+
+.step-dot.done .dot {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+.step-dot .dot-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.step-dot.active .dot-label { color: var(--gold-lt); }
+
+.step-line {
+  width: 60px;
+  height: 1px;
+  background: rgba(201,169,110,0.15);
+  margin: 0 4px;
+  margin-bottom: 22px;
+}
+
+/* ── FORM STEPS ── */
+.form-step { display: none; }
+.form-step.active { display: block; }
+
+/* ── FIELD GROUPS ── */
+.field-group {
+  margin-bottom: 22px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
 
 label {
   display: block;
-  margin-top: 12px;
-  margin-bottom: 6px;
-  font-size: 14px;
-  color: #bbb;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
 }
 
 input, select, textarea {
   width: 100%;
-  padding: 14px;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  border: 1px solid #222;
-  background: #111;
-  color: #fff;
+  padding: 13px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(201,169,110,0.12);
+  background: rgba(255,255,255,0.03);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  transition: border-color 0.2s, background 0.2s;
+  outline: none;
+  -webkit-appearance: none;
 }
 
-/* Price Box */
-.price-preview {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
-  text-align: center;
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(201,169,110,0.45);
+  background: rgba(201,169,110,0.04);
 }
 
-.price-preview span {
-  font-size: 22px;
-  font-weight: 600;
+select option { background: #1a1410; color: var(--cream); }
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.6;
 }
 
-/* Button */
-button {
-  width: 100%;
-  padding: 16px;
-  background: #fff;
-  color: #000;
-  border-radius: 999px;
-  border: none;
-  font-weight: 500;
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5) sepia(1) saturate(2) hue-rotate(10deg);
   cursor: pointer;
 }
 
-button:hover {
-  background: #ddd;
+/* ── SIZE SELECTOR ── */
+.size-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.size-opt {
+  border: 1px solid rgba(201,169,110,0.15);
+  border-radius: var(--radius);
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.02);
+}
+
+.size-opt:hover { border-color: rgba(201,169,110,0.4); }
+
+.size-opt.selected {
+  border-color: var(--gold);
+  background: rgba(201,169,110,0.08);
+}
+
+.size-opt .size-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--cream);
+  display: block;
+}
+
+.size-opt .size-dims {
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+  display: block;
+}
+
+.size-opt .size-price {
+  font-size: 0.72rem;
+  color: var(--gold);
+  margin-top: 6px;
+  display: block;
+}
+
+/* ── TYPE SELECTOR ── */
+.type-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.type-opt {
+  border: 1px solid rgba(201,169,110,0.15);
+  border-radius: var(--radius);
+  padding: 18px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.02);
+}
+
+.type-opt:hover { border-color: rgba(201,169,110,0.4); }
+.type-opt.selected {
+  border-color: var(--gold);
+  background: rgba(201,169,110,0.08);
+}
+
+.type-opt .type-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--cream);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.type-opt .type-desc {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── PEOPLE COUNTER ── */
+.people-counter {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.counter-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.25);
+  background: transparent;
+  color: var(--cream);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.counter-btn:hover {
+  border-color: var(--gold);
+  background: rgba(201,169,110,0.1);
+  color: var(--gold);
+}
+
+.counter-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: var(--cream);
+  min-width: 30px;
+  text-align: center;
+}
+
+.counter-note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── PRICE PREVIEW ── */
+.price-preview {
+  background: rgba(201,169,110,0.06);
+  border: 1px solid rgba(201,169,110,0.18);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 12px;
+}
+
+.price-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.price-amount {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--gold-lt);
+}
+
+.price-breakdown {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* ── DIVIDER ── */
+.form-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 28px 0;
+}
+.form-divider::before,
+.form-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(201,169,110,0.1);
+}
+.form-divider span {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--gold);
+  opacity: 0.5;
+  font-size: 1rem;
+}
+
+/* ── BUTTONS ── */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.btn {
+  flex: 1;
+  padding: 14px 24px;
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: var(--ink);
+}
+.btn-primary:hover {
+  background: var(--gold-lt);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(201,169,110,0.25);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(201,169,110,0.2);
+  color: var(--muted);
+}
+.btn-ghost:hover {
+  border-color: var(--gold);
+  color: var(--cream);
+}
+
+/* ── SUMMARY ── */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.88rem;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-key { color: var(--muted); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.summary-val { color: var(--cream); font-weight: 500; }
+.summary-total .summary-key { color: var(--gold); }
+.summary-total .summary-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--gold-lt);
+}
+
+.wa-note {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 16px;
+  line-height: 1.6;
 }
 </style>
 </head>
 
 <body>
+<canvas id="bgCanvas"></canvas>
 
-<div class="bg-glow"></div>
+<nav>
+  <a href="index.html" class="nav-logo">Artist X</a>
+  <a href="index.html" class="nav-back">← Back</a>
+</nav>
 
-<div class="container">
-  <h1>Request Your Portrait</h1>
+<div class="page">
+  <div class="page-header">
+    <div class="eyebrow">Commission a Work</div>
+    <h1>Request Your Portrait</h1>
+    <p>Fill in the details below and we'll connect on WhatsApp</p>
+  </div>
 
-  <form id="form" action="https://formspree.io/f/xqeynzvq" method="POST">
+  <div class="form-card">
 
-    <label>Your Name</label>
-    <input type="text" name="name" id="name" required>
-
-    <label>Your Email</label>
-    <input type="email" name="email" id="email" required>
-
-    <label>Phone Number</label>
-    <input type="tel" name="phone" id="phone">
-
-    <label>Type of Portrait</label>
-    <select name="type" id="type">
-      <option value="B/W Pencil Sketch">B/W Pencil Sketch</option>
-      <option value="Colour Pencil Sketch">Colour Pencil Sketch</option>
-    </select>
-
-    <label>Size</label>
-    <select name="size" id="size">
-      <option value="A5">A5</option>
-      <option value="A4">A4</option>
-      <option value="A3">A3</option>
-    </select>
-
-    <label>Number of People</label>
-    <input type="number" name="people" id="people" min="1" value="1">
-
-    <!-- PRICE -->
-    <div class="price-preview">
-      Estimated Price: ₹<span id="price">1000</span>
+    <!-- STEPS BAR -->
+    <div class="steps-bar">
+      <div class="step-dot active" id="sdot-1">
+        <div class="dot">1</div>
+        <div class="dot-label">Details</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="sdot-2">
+        <div class="dot">2</div>
+        <div class="dot-label">Artwork</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="sdot-3">
+        <div class="dot">3</div>
+        <div class="dot-label">Review</div>
+      </div>
     </div>
 
-    <label>Preferred Date</label>
-    <input type="date" name="date" id="date">
+    <!-- STEP 1: PERSONAL DETAILS -->
+    <div class="form-step active" id="step-1">
+      <div class="field-row">
+        <div class="field-group">
+          <label>Your Name *</label>
+          <input type="text" id="name" placeholder="Sharan Bangera" required>
+        </div>
+        <div class="field-group">
+          <label>Phone Number *</label>
+          <input type="tel" id="phone" placeholder="+91 98765 43210" required>
+        </div>
+      </div>
 
-    <label>What do you need?</label>
-    <select name="intent" id="intent">
-      <option>Call me</option>
-      <option>Send quotation</option>
-      <option>Ready to book</option>
-    </select>
+      <div class="field-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com">
+      </div>
 
-    <label>Additional Details</label>
-    <textarea name="notes" id="notes"></textarea>
+      <div class="field-group">
+        <label>Preferred Date</label>
+        <input type="date" id="date">
+      </div>
 
-    <p style="font-size:12px; color:#777;">
-      After submitting, you will be redirected to WhatsApp to send your photo.
-    </p>
+      <div class="field-group">
+        <label>What are you looking for?</label>
+        <select id="intent">
+          <option value="Ready to book">Ready to book — confirm slot</option>
+          <option value="Send quotation">Send me a quotation first</option>
+          <option value="Call me">Call me to discuss</option>
+        </select>
+      </div>
 
-    <button type="submit">Submit & Continue</button>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goStep(2)">Next →</button>
+      </div>
+    </div>
 
-  </form>
+    <!-- STEP 2: ARTWORK DETAILS -->
+    <div class="form-step" id="step-2">
+
+      <div class="field-group">
+        <label>Type of Sketch</label>
+        <div class="type-options">
+          <div class="type-opt selected" data-type="bw" onclick="selectType(this)">
+            <span class="type-name">B/W Pencil</span>
+            <span class="type-desc">Classic graphite sketch, timeless and detailed</span>
+          </div>
+          <div class="type-opt" data-type="color" onclick="selectType(this)">
+            <span class="type-name">Colour Pencil</span>
+            <span class="type-desc">Vibrant colour work, full of life and warmth</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Paper Size</label>
+        <div class="size-options">
+          <div class="size-opt" data-size="A5" onclick="selectSize(this)">
+            <span class="size-name">A5</span>
+            <span class="size-dims">14.8 × 21 cm</span>
+            <span class="size-price" id="sp-A5">from ₹1,000</span>
+          </div>
+          <div class="size-opt selected" data-size="A4" onclick="selectSize(this)">
+            <span class="size-name">A4</span>
+            <span class="size-dims">21 × 29.7 cm</span>
+            <span class="size-price" id="sp-A4">from ₹2,500</span>
+          </div>
+          <div class="size-opt" data-size="A3" onclick="selectSize(this)">
+            <span class="size-name">A3</span>
+            <span class="size-dims">29.7 × 42 cm</span>
+            <span class="size-price" id="sp-A3">from ₹7,000</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Number of People</label>
+        <div class="people-counter">
+          <button class="counter-btn" onclick="changePeople(-1)">−</button>
+          <span class="counter-val" id="peopleVal">1</span>
+          <button class="counter-btn" onclick="changePeople(1)">+</button>
+          <span class="counter-note">Extra person charges apply<br>from the 2nd person onward</span>
+        </div>
+      </div>
+
+      <div class="form-divider"><span>✦</span></div>
+
+      <div class="price-preview">
+        <div>
+          <div class="price-label">Estimated Price</div>
+          <div class="price-breakdown" id="priceBreakdown">Base price · 1 person</div>
+        </div>
+        <div>
+          <div class="price-amount">₹<span id="price">2500</span></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Photo Link <span style="color:var(--muted);font-size:0.65rem;text-transform:none;letter-spacing:0">(Google Drive, WhatsApp, etc.)</span></label>
+        <input type="text" id="photo" placeholder="https://drive.google.com/...">
+      </div>
+
+      <div class="field-group">
+        <label>Additional Notes</label>
+        <textarea id="notes" placeholder="Any specific requirements, pose, background, framing preferences..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goStep(3)">Review →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: REVIEW & SUBMIT -->
+    <div class="form-step" id="step-3">
+      <div id="summaryRows"></div>
+
+      <div class="btn-row" style="margin-top:36px;">
+        <button class="btn btn-ghost" onclick="goStep(2)">← Edit</button>
+        <button class="btn btn-primary" onclick="submitForm()">📲 Send on WhatsApp</button>
+      </div>
+      <p class="wa-note">Tapping the button will open WhatsApp with all your details pre-filled. You can review before sending.</p>
+    </div>
+
+  </div>
 </div>
 
 <script>
-/* PRICE CALCULATOR */
-
-function calculatePrice() {
-  const type = document.getElementById("type").value;
-  const size = document.getElementById("size").value;
-  const people = parseInt(document.getElementById("people").value) || 1;
-
-  let base = 0;
-  let extra = 0;
-
-  if (type.includes("B/W")) {
-    if (size === "A5") { base = 1000; extra = 500; }
-    if (size === "A4") { base = 2500; extra = 1200; }
-    if (size === "A3") { base = 7000; extra = 2000; }
+/* ── CANVAS PARTICLES ── */
+(function() {
+  const canvas = document.getElementById("bgCanvas");
+  const ctx = canvas.getContext("2d");
+  let W, H, particles = [];
+  const COUNT = 70;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener("resize", resize);
+  function rand(a,b){ return Math.random()*(b-a)+a; }
+  for(let i=0;i<COUNT;i++) particles.push({x:rand(0,1000),y:rand(0,800),r:rand(0.8,2.5),alpha:rand(0.15,0.65),vx:rand(-0.1,0.1),vy:rand(-0.2,-0.05),pulse:rand(0,Math.PI*2),ps:rand(0.008,0.02)});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const g=ctx.createRadialGradient(W*.25,H*.2,0,W*.5,H*.5,Math.max(W,H)*.85);
+    g.addColorStop(0,"#1f1205"); g.addColorStop(.5,"#0a0702"); g.addColorStop(1,"#000");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.pulse+=p.ps;
+      const a=p.alpha*(0.6+0.4*Math.sin(p.pulse));
+      const gl=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*5);
+      gl.addColorStop(0,"rgba(226,201,152,"+(a*.5)+")"); gl.addColorStop(1,"transparent");
+      ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*5,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle="rgba(201,169,110,"+a+")"; ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y<-10){p.y=H+10;p.x=rand(0,W);}
+      if(p.x<-10)p.x=W+10; if(p.x>W+10)p.x=-10;
+    });
+    requestAnimationFrame(draw);
   }
+  draw();
+})();
 
-  if (type.includes("Colour")) {
-    if (size === "A5") { base = 1500; extra = 700; }
-    if (size === "A4") { base = 4000; extra = 1500; }
-    if (size === "A3") { base = 9000; extra = 3000; }
-  }
+/* ── STATE ── */
+let selectedType = "bw";
+let selectedSize = "A4";
+let people = 1;
 
-  const total = base + (people - 1) * extra;
-  document.getElementById("price").innerText = total;
+const prices = {
+  bw:    { A5: [1000,500],  A4: [2500,1200],  A3: [7000,2000] },
+  color: { A5: [1500,700],  A4: [4000,1500],  A3: [9000,3000] }
+};
+
+const sizePriceLabels = { A5: "from ₹1,000", A4: "from ₹2,500", A3: "from ₹7,000" };
+
+function selectType(el) {
+  document.querySelectorAll(".type-opt").forEach(e => e.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedType = el.dataset.type;
+  updatePrice();
+  updateSizePriceLabels();
 }
 
-document.querySelectorAll("#type, #size, #people").forEach(el => {
-  el.addEventListener("change", calculatePrice);
-});
+function selectSize(el) {
+  document.querySelectorAll(".size-opt").forEach(e => e.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedSize = el.dataset.size;
+  updatePrice();
+}
 
-calculatePrice();
+function changePeople(dir) {
+  people = Math.max(1, people + dir);
+  document.getElementById("peopleVal").textContent = people;
+  updatePrice();
+}
 
-/* SUBMIT FLOW */
+function updatePrice() {
+  const [base, extra] = prices[selectedType][selectedSize];
+  const total = base + (people - 1) * extra;
+  document.getElementById("price").textContent = total.toLocaleString("en-IN");
+  let breakdown = `Base ₹${base.toLocaleString("en-IN")}`;
+  if (people > 1) breakdown += ` · +${people-1} person${people>2?'s':''} ₹${((people-1)*extra).toLocaleString("en-IN")}`;
+  document.getElementById("priceBreakdown").textContent = breakdown;
+}
 
-document.getElementById("form").addEventListener("submit", async function(e) {
-  e.preventDefault();
+function updateSizePriceLabels() {
+  ["A5","A4","A3"].forEach(s => {
+    const [base] = prices[selectedType][s];
+    document.getElementById("sp-"+s).textContent = `from ₹${base.toLocaleString("en-IN")}`;
+  });
+}
 
-  const form = e.target;
+/* ── STEPS ── */
+function goStep(n) {
+  // validate step 1
+  if (n === 2) {
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    if (!name || !phone) { alert("Please enter your name and phone number."); return; }
+  }
 
-  // Send to Formspree
-  await fetch(form.action, {
-    method: "POST",
-    body: new FormData(form),
-    headers: { 'Accept': 'application/json' }
+  // build summary on step 3
+  if (n === 3) buildSummary();
+
+  document.querySelectorAll(".form-step").forEach((s,i) => {
+    s.classList.toggle("active", i === n-1);
   });
 
-  // Build WhatsApp message
-  const name = document.getElementById("name").value;
-  const type = document.getElementById("type").value;
-  const size = document.getElementById("size").value;
-  const people = document.getElementById("people").value;
-  const date = document.getElementById("date").value;
-  const price = document.getElementById("price").innerText;
+  // update step dots
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById("sdot-"+i);
+    dot.classList.remove("active","done");
+    if (i === n) dot.classList.add("active");
+    if (i < n)  dot.classList.add("done");
+  }
 
-  const message = 
-`Hi, I have submitted a portrait request.
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
-Name: ${name}
-Type: ${type}
-Size: ${size}
+/* ── SUMMARY ── */
+function buildSummary() {
+  const typeLabel = selectedType === "bw" ? "B/W Pencil Sketch" : "Colour Pencil Sketch";
+  const [base, extra] = prices[selectedType][selectedSize];
+  const total = base + (people - 1) * extra;
+
+  const rows = [
+    ["Name",    document.getElementById("name").value],
+    ["Phone",   document.getElementById("phone").value],
+    ["Email",   document.getElementById("email").value || "—"],
+    ["Date",    document.getElementById("date").value || "—"],
+    ["Intent",  document.getElementById("intent").value],
+    ["Type",    typeLabel],
+    ["Size",    `${selectedSize} (${selectedSize==="A5"?"14.8×21":selectedSize==="A4"?"21×29.7":"29.7×42"} cm)`],
+    ["People",  people],
+    ["Photo",   document.getElementById("photo").value || "—"],
+    ["Notes",   document.getElementById("notes").value || "—"],
+  ];
+
+  const html = rows.map(([k,v]) => `
+    <div class="summary-row">
+      <span class="summary-key">${k}</span>
+      <span class="summary-val">${v}</span>
+    </div>
+  `).join("") + `
+    <div class="summary-row summary-total" style="margin-top:12px;padding-top:16px;border-top:1px solid rgba(201,169,110,0.15);border-bottom:none;">
+      <span class="summary-key">Estimated Total</span>
+      <span class="summary-val">₹${total.toLocaleString("en-IN")}</span>
+    </div>
+  `;
+
+  document.getElementById("summaryRows").innerHTML = html;
+}
+
+/* ── SUBMIT ── */
+function submitForm() {
+  const typeLabel = selectedType === "bw" ? "B/W Pencil Sketch" : "Colour Pencil Sketch";
+  const [base, extra] = prices[selectedType][selectedSize];
+  const total = base + (people - 1) * extra;
+
+  const msg =
+`Hi, I'd like to request a portrait.
+
+Name: ${document.getElementById("name").value}
+Phone: ${document.getElementById("phone").value}
+Email: ${document.getElementById("email").value || "—"}
+Date: ${document.getElementById("date").value || "—"}
+Intent: ${document.getElementById("intent").value}
+
+Type: ${typeLabel}
+Size: ${selectedSize}
 People: ${people}
-Date: ${date}
+Estimated Price: ₹${total.toLocaleString("en-IN")}
 
-Estimated Price: ₹${price}
+Photo: ${document.getElementById("photo").value || "—"}
+Notes: ${document.getElementById("notes").value || "—"}`;
 
-Sharing the image here.`;
+  window.open(`https://wa.me/919945070481?text=${encodeURIComponent(msg)}`, "_blank");
+}
 
-  // Redirect to WhatsApp
-  window.open(`https://wa.me/919945070481?text=${encodeURIComponent(message)}`, "_blank");
-});
+/* ── INIT ── */
+updatePrice();
 </script>
-
 </body>
 </html>
