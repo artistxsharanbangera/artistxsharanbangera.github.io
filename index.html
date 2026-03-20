@@ -715,7 +715,7 @@ footer a { color: var(--gold); text-decoration: none; }
   <h1>Turning Your Memories<br>Into Timeless Art</h1>
   <p>Realistic pencil sketches crafted from your photos</p>
   <div class="hero-ctas">
-    <a href="https://wa.me/919945070481?text=Hi%20I%20want%20to%20book%20a%20portrait" class="btn btn-primary">Book Your Portrait</a>
+    <a href="#book" class="btn btn-primary">Book Your Portrait</a>
     <a href="#portfolio" class="btn btn-outline">View Portfolio</a>
   </div>
 </section>
@@ -732,9 +732,10 @@ footer a { color: var(--gold); text-decoration: none; }
     <div class="portfolio-item" onclick="openLightbox(4)"><img src="images/portrait5.jpg" alt="Portrait 5" loading="lazy"></div>
     <div class="portfolio-item" onclick="openLightbox(5)"><img src="images/portrait1.jpg" alt="Portrait 6" loading="lazy"></div>
   </div>
+  <div style="text-align:center; margin-top: 32px;">
+    <a href="gallery.html" class="btn btn-outline">View Full Gallery</a>
+  </div>
 </section>
-
-<!-- ── LIGHTBOX ── -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
   <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">✕</button>
   <div class="lightbox-img-wrap">
@@ -859,7 +860,7 @@ footer a { color: var(--gold); text-decoration: none; }
 </section>
 
 <!-- ── CTA ── -->
-<section class="cta-section dark-section">
+<section id="book" class="cta-section dark-section">
   <div class="cta-inner">
     <h2>Ready to Preserve a Memory?</h2>
     <p>Limited slots available each month. Reach out today.</p>
