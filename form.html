@@ -561,12 +561,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="steps-bar">
       <div class="step-dot active" id="sdot-1">
         <div class="dot">1</div>
-        <div class="dot-label">Details</div>
+        <div class="dot-label">Artwork</div>
       </div>
       <div class="step-line"></div>
       <div class="step-dot" id="sdot-2">
         <div class="dot">2</div>
-        <div class="dot-label">Artwork</div>
+        <div class="dot-label">Details</div>
       </div>
       <div class="step-line"></div>
       <div class="step-dot" id="sdot-3">
@@ -575,58 +575,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       </div>
     </div>
 
-    <!-- STEP 1: PERSONAL DETAILS -->
-    <div class="form-step active" id="step-1">
-      <div class="field-row">
-        <div class="field-group">
-          <label>Your Name *</label>
-          <input type="text" id="name" placeholder="Sharan Bangera" required>
-        </div>
-        <div class="field-group">
-          <label>Phone Number *</label>
-          <input type="tel" id="phone" placeholder="+91 98765 43210" required>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label>Email Address</label>
-        <input type="email" id="email" placeholder="you@example.com">
-      </div>
-
-      <div class="field-group">
-        <label>Delivery Address</label>
-        <textarea id="address" placeholder="House / flat no., street, city, state, pincode..." style="min-height:70px;"></textarea>
-        <div class="pincode-row">
-          <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-            <input type="text" id="pincode" placeholder="Enter delivery pincode" maxlength="6" style="margin-bottom:0; flex:1;">
-            <button type="button" onclick="fetchRates()" class="btn btn-ghost" style="padding:12px 18px; border-radius:10px; white-space:nowrap; flex-shrink:0;">Check Rates</button>
-          </div>
-          <div class="delivery-estimate" id="deliveryEstimate"></div>
-          <div id="courierList" style="margin-top:10px; display:none;"></div>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label>Preferred Date</label>
-        <input type="date" id="date">
-      </div>
-
-      <div class="field-group">
-        <label>What are you looking for?</label>
-        <select id="intent">
-          <option value="Ready to book">Ready to book — confirm slot</option>
-          <option value="Send quotation">Send me a quotation first</option>
-          <option value="Call me">Call me to discuss</option>
-        </select>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="goStep(2)">Next →</button>
-      </div>
-    </div>
-
-    <!-- STEP 2: ARTWORK DETAILS -->
-    <div class="form-step" id="step-2">
+    <!-- STEP 2: ARTWORK DETAILS (now step 1) -->
+    <div  id="step-1" class="form-step active">
 
       <div class="field-group">
         <label>Type of Sketch</label>
@@ -731,6 +681,49 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <div class="field-group">
         <label>Additional Notes</label>
         <textarea id="notes" placeholder="Any specific requirements, pose, background, framing preferences..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goStep(2)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: PERSONAL DETAILS (now step 2) -->
+    <div class="form-step" id="step-2">
+      <div class="field-row">
+        <div class="field-group">
+          <label>Your Name *</label>
+          <input type="text" id="name" placeholder="Sharan Bangera" required>
+        </div>
+        <div class="field-group">
+          <label>Phone Number *</label>
+          <input type="tel" id="phone" placeholder="+91 98765 43210" required>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com">
+      </div>
+
+      <div class="field-group">
+        <label>Delivery Address</label>
+        <textarea id="address" placeholder="House / flat no., street, city, state, pincode..." style="min-height:70px;"></textarea>
+
+      </div>
+
+      <div class="field-group">
+        <label>Preferred Date</label>
+        <input type="date" id="date">
+      </div>
+
+      <div class="field-group">
+        <label>What are you looking for?</label>
+        <select id="intent">
+          <option value="Ready to book">Ready to book — confirm slot</option>
+          <option value="Send quotation">Send me a quotation first</option>
+          <option value="Call me">Call me to discuss</option>
+        </select>
       </div>
 
       <div class="btn-row">
