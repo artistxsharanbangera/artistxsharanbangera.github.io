@@ -597,8 +597,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <label>Delivery Address</label>
         <textarea id="address" placeholder="House / flat no., street, city, state, pincode..." style="min-height:70px;"></textarea>
         <div class="pincode-row">
-          <input type="text" id="pincode" placeholder="Enter pincode for delivery estimate" maxlength="6" oninput="estimateDelivery()" style="margin-top:8px; margin-bottom:4px;">
+          <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+            <input type="text" id="pincode" placeholder="Enter delivery pincode" maxlength="6" style="margin-bottom:0; flex:1;">
+            <button type="button" onclick="fetchRates()" class="btn btn-ghost" style="padding:12px 18px; border-radius:10px; white-space:nowrap; flex-shrink:0;">Check Rates</button>
+          </div>
           <div class="delivery-estimate" id="deliveryEstimate"></div>
+          <div id="courierList" style="margin-top:10px; display:none;"></div>
         </div>
       </div>
 
@@ -833,7 +837,6 @@ function selectFrame(el) {
   selectedFrame = el.dataset.frame;
   updateFrameDescs();
   updatePrice();
-  estimateDelivery();
 }
 
 function updateFrameDescs() {
