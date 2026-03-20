@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gallery · Sharan Bangera · Artist X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:   #f5ede0;
+  --gold:    #c9a96e;
+  --gold-lt: #e2c998;
+  --ink:     #0e0b08;
+  --muted:   #8a7d6e;
+  --radius:  14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--ink);
+  color: var(--cream);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ── CANVAS BG ── */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px clamp(20px, 5vw, 60px);
+  background: rgba(8,6,4,0.75);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(201,169,110,0.1);
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--cream);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+
+.nav-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.nav-back:hover { color: var(--gold); }
+
+/* ── HEADER ── */
+.gallery-header {
+  text-align: center;
+  padding: clamp(50px, 8vw, 90px) 20px 40px;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.85;
+  margin-bottom: 12px;
+}
+
+.gallery-header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.15;
+  color: var(--cream);
+}
+
+/* ── FILTERS ── */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0 20px 50px;
+}
+
+.filter-btn {
+  padding: 9px 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(201,169,110,0.2);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.filter-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-lt);
+}
+
+.filter-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ── MASONRY ── */
+.masonry-wrap {
+  padding: 0 clamp(16px, 3vw, 40px) 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.masonry {
+  columns: 2;
+  column-gap: 14px;
+}
+
+@media (min-width: 600px)  { .masonry { columns: 3; } }
+@media (min-width: 900px)  { .masonry { columns: 4; } }
+@media (min-width: 1200px) { .masonry { columns: 5; } }
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 14px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid rgba(201,169,110,0.08);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.masonry-item.hidden {
+  display: none;
+}
+
+.masonry-item img,
+.masonry-item video {
+  width: 100%;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.masonry-item:hover img,
+.masonry-item:hover video { transform: scale(1.04); }
+
+.masonry-item video { object-fit: cover; }
+
+.play-badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: rgba(8,6,4,0.65);
+  border: 1px solid rgba(201,169,110,0.3);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--gold-lt);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.masonry-item::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 28px 14px 14px;
+  background: linear-gradient(transparent, rgba(8,6,4,0.75));
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(245,237,224,0.6);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.masonry-item:hover::after { opacity: 1; }
+
+/* ── LIGHTBOX ── */
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(8,6,4,0.97);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+}
+.lightbox.open { display: flex; }
+
+.lightbox-img-wrap {
+  position: relative;
+  max-width: min(90vw, 720px);
+  max-height: 82svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: 80svh;
+  border-radius: 12px;
+  object-fit: contain;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+  transition: opacity 0.2s ease;
+}
+
+.lightbox-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(245,237,224,0.08);
+  border: 1px solid rgba(245,237,224,0.15);
+  color: var(--cream);
+  font-size: 1.4rem;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s;
+}
+.lightbox-btn:hover { background: rgba(201,169,110,0.25); }
+.lightbox-btn.prev { left: -54px; }
+.lightbox-btn.next { right: -54px; }
+
+@media (max-width: 600px) {
+  .lightbox-btn.prev { left: 4px; }
+  .lightbox-btn.next { right: 4px; }
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 20px; right: 24px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1;
+}
+.lightbox-close:hover { color: var(--cream); }
+
+.lightbox-meta {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.lightbox-counter {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+}
+
+.lightbox-tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+}
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 28px 20px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+footer a { color: var(--gold); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Artist X</a>
+  <a href="index.html" class="nav-back">← Back to Home</a>
+</nav>
+
+<!-- HEADER -->
+<div class="gallery-header">
+  <div class="eyebrow">308 Posts · Still Drawing</div>
+  <h1>The Full Gallery</h1>
+</div>
+
+<!-- FILTERS -->
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="bw">B/W Pencil</button>
+  <button class="filter-btn" data-filter="colour">Colour</button>
+  <button class="filter-btn" data-filter="couple">Couples</button>
+  <button class="filter-btn" data-filter="celebrity">Celebrity</button>
+  <button class="filter-btn" data-filter="devotional">Devotional</button>
+  <button class="filter-btn" data-filter="child">Children</button>
+</div>
+
+<!-- MASONRY GRID -->
+<div class="masonry-wrap">
+  <div class="masonry" id="masonryGrid">
+
+    <!--
+      HOW TO ADD YOUR IMAGES:
+      Each item needs:
+        - src="images/gallery/your-image.jpg"
+        - data-cat="bw" (or colour / couple / celebrity / devotional / child)
+        - data-label="A short description"
+
+      Example:
+      <div class="masonry-item" data-cat="bw" data-label="B/W · Solo Portrait">
+        <img src="images/gallery/portrait-001.jpg" alt="Portrait" loading="lazy">
+      </div>
+
+      CATEGORIES:
+        bw          → B/W Pencil sketches
+        colour      → Colour pencil sketches
+        couple      → Couple portraits
+        celebrity   → Celebrity fan art
+        devotional  → Gods / spiritual art
+        child       → Children portraits
+
+      ADD AS MANY ITEMS AS YOU WANT — the masonry layout handles it automatically.
+    -->
+
+    <!-- ── PLACEHOLDERS (replace src with your actual image paths) ── -->
+
+    <div class="masonry-item" data-cat="colour" data-label="Colour · Devotional" onclick="openLightbox(0)">
+      <img src="images/gallery/g01.jpg" alt="Ganesha colour" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="bw" data-label="B/W · Solo Portrait" onclick="openLightbox(1)">
+      <img src="images/gallery/g02.jpg" alt="Portrait" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="colour" data-label="Colour · Solo" onclick="openLightbox(2)">
+      <img src="images/gallery/g03.jpg" alt="Colour portrait" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="celebrity" data-label="Celebrity · B/W" onclick="openLightbox(3)">
+      <img src="images/gallery/g04.jpg" alt="Celebrity" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="couple" data-label="Couple Portrait" onclick="openLightbox(4)">
+      <img src="images/gallery/g05.jpg" alt="Couple" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="bw" data-label="B/W · Classical Dance" onclick="openLightbox(5)">
+      <img src="images/gallery/g06.jpg" alt="Dancer" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="colour" data-label="Colour · Portrait" onclick="openLightbox(6)">
+      <img src="images/gallery/g07.jpg" alt="Colour" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="child" data-label="Child Portrait" onclick="openLightbox(7)">
+      <img src="images/gallery/g08.jpg" alt="Child" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="devotional" data-label="Devotional · Colour" onclick="openLightbox(8)">
+      <img src="images/gallery/g09.jpg" alt="Devotional" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="celebrity" data-label="Celebrity · Colour" onclick="openLightbox(9)">
+      <img src="images/gallery/g10.jpg" alt="Celebrity colour" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="bw" data-label="B/W · Solo" onclick="openLightbox(10)">
+      <img src="images/gallery/g11.jpg" alt="Portrait" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="couple" data-label="Couple · Colour" onclick="openLightbox(11)">
+      <img src="images/gallery/g12.jpg" alt="Couple colour" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="colour" data-label="Colour · Full Figure" onclick="openLightbox(12)">
+      <img src="images/gallery/g13.jpg" alt="Full figure" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="bw" data-label="B/W · Detailed" onclick="openLightbox(13)">
+      <img src="images/gallery/g14.jpg" alt="Detailed" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="celebrity" data-label="Celebrity · B/W" onclick="openLightbox(14)">
+      <img src="images/gallery/g15.jpg" alt="Celebrity" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="devotional" data-label="Devotional · B/W" onclick="openLightbox(15)">
+      <img src="images/gallery/g16.jpg" alt="Devotional" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="child" data-label="Child · B/W" onclick="openLightbox(16)">
+      <img src="images/gallery/g17.jpg" alt="Child" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="bw" data-label="B/W · Portrait" onclick="openLightbox(17)">
+      <img src="images/gallery/g18.jpg" alt="Portrait" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="colour" data-label="Colour · Saree" onclick="openLightbox(18)">
+      <img src="images/gallery/g19.jpg" alt="Saree" loading="lazy">
+    </div>
+    <div class="masonry-item" data-cat="couple" data-label="Couple · B/W" onclick="openLightbox(19)">
+      <img src="images/gallery/g20.jpg" alt="Couple" loading="lazy">
+    </div>
+
+    <!-- Add more items here following the same pattern -->
+
+    <!--
+      HOW TO ADD A VIDEO:
+      <div class="masonry-item" data-cat="bw" data-label="Timelapse · B/W" data-type="video" data-src="images/gallery/video1.mp4" onclick="openLightbox(INDEX)">
+        <video src="images/gallery/video1.mp4" muted autoplay loop playsinline></video>
+        <div class="play-badge">▶ Video</div>
+      </div>
+
+      Key differences from image items:
+        - Add data-type="video"
+        - Add data-src="path/to/video.mp4"
+        - Use <video> tag instead of <img>
+        - Add the <div class="play-badge"> inside
+    -->
+
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <div class="lightbox-img-wrap">
+    <button class="lightbox-btn prev" onclick="shiftLightbox(-1)">‹</button>
+    <img id="lightbox-img" src="" alt="" style="display:none">
+    <video id="lightbox-video" controls style="display:none; max-width:min(90vw,720px); max-height:80svh; border-radius:12px; box-shadow:0 30px 80px rgba(0,0,0,0.8);"></video>
+    <button class="lightbox-btn next" onclick="shiftLightbox(1)">›</button>
+  </div>
+  <div class="lightbox-meta">
+    <div class="lightbox-tag" id="lightbox-tag"></div>
+    <div class="lightbox-counter" id="lightbox-counter"></div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 Sharan Bangera · <a href="https://wa.me/919945070481">Book a Portrait</a> · <a href="index.html">Home</a></p>
+</footer>
+
+<script>
+/* ── CANVAS PARTICLES (same as index) ── */
+(function() {
+  const canvas = document.getElementById("bgCanvas");
+  const ctx = canvas.getContext("2d");
+  let W, H, particles = [];
+  const COUNT = 70;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener("resize", resize);
+  function rand(a,b){ return Math.random()*(b-a)+a; }
+  for(let i=0;i<COUNT;i++) particles.push({x:rand(0,1000),y:rand(0,800),r:rand(0.8,2.5),alpha:rand(0.15,0.65),vx:rand(-0.1,0.1),vy:rand(-0.2,-0.05),pulse:rand(0,Math.PI*2),ps:rand(0.008,0.02)});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const g=ctx.createRadialGradient(W*.25,H*.2,0,W*.5,H*.5,Math.max(W,H)*.85);
+    g.addColorStop(0,"#1f1205"); g.addColorStop(.5,"#0a0702"); g.addColorStop(1,"#000");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.pulse+=p.ps;
+      const a=p.alpha*(0.6+0.4*Math.sin(p.pulse));
+      const gl=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*5);
+      gl.addColorStop(0,"rgba(226,201,152,"+(a*.5)+")"); gl.addColorStop(1,"transparent");
+      ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*5,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle="rgba(201,169,110,"+a+")"; ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y<-10){p.y=H+10;p.x=rand(0,W);}
+      if(p.x<-10)p.x=W+10; if(p.x>W+10)p.x=-10;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── FILTERS ── */
+const filterBtns = document.querySelectorAll(".filter-btn");
+const items = Array.from(document.querySelectorAll(".masonry-item"));
+
+filterBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    filterBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const filter = btn.dataset.filter;
+    items.forEach(item => {
+      const match = filter === "all" || item.dataset.cat === filter;
+      item.classList.toggle("hidden", !match);
+    });
+    // rebuild lightbox index for visible items
+    buildVisibleList();
+  });
+});
+
+/* ── LIGHTBOX ── */
+let visibleItems = [];
+let currentIdx = 0;
+
+function buildVisibleList() {
+  visibleItems = items.filter(i => !i.classList.contains("hidden"));
+}
+buildVisibleList();
+
+let activePreviewVideo = null;
+
+function openLightbox(globalIdx) {
+  const item = items[globalIdx];
+  currentIdx = visibleItems.indexOf(item);
+  if (currentIdx < 0) currentIdx = 0;
+  updateLightbox();
+  document.getElementById("lightbox").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeLightbox() {
+  // stop lightbox video
+  const lbVid = document.getElementById("lightbox-video");
+  lbVid.pause();
+  lbVid.src = "";
+
+  // restore preview video
+  if (activePreviewVideo) {
+    activePreviewVideo.play();
+    activePreviewVideo = null;
+  }
+
+  document.getElementById("lightbox").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function shiftLightbox(dir) {
+  const lbImg = document.getElementById("lightbox-img");
+  const lbVid = document.getElementById("lightbox-video");
+  lbImg.style.opacity = 0;
+  lbVid.style.opacity = 0;
+
+  // restore previous preview video before shifting
+  if (activePreviewVideo) {
+    activePreviewVideo.play();
+    activePreviewVideo = null;
+  }
+
+  setTimeout(() => {
+    currentIdx = (currentIdx + dir + visibleItems.length) % visibleItems.length;
+    updateLightbox();
+    lbImg.style.opacity = 1;
+    lbVid.style.opacity = 1;
+  }, 180);
+}
+
+function updateLightbox() {
+  const item = visibleItems[currentIdx];
+  const lbImg = document.getElementById("lightbox-img");
+  const lbVid = document.getElementById("lightbox-video");
+  const isVideo = item.dataset.type === "video";
+
+  // pause & mute the in-grid preview video
+  const previewVid = item.querySelector("video");
+  if (previewVid) {
+    previewVid.pause();
+    activePreviewVideo = previewVid;
+  }
+
+  if (isVideo) {
+    lbImg.style.display = "none";
+    lbVid.style.display = "block";
+    lbVid.src = item.dataset.src;
+    lbVid.muted = false;
+    lbVid.play();
+  } else {
+    lbVid.style.display = "none";
+    lbVid.pause(); lbVid.src = "";
+    lbImg.style.display = "block";
+    lbImg.src = item.querySelector("img").src;
+  }
+
+  document.getElementById("lightbox-tag").textContent = item.dataset.label || "";
+  document.getElementById("lightbox-counter").textContent = `${currentIdx + 1} / ${visibleItems.length}`;
+}
+
+document.getElementById("lightbox").addEventListener("click", function(e) {
+  if (e.target === this) closeLightbox();
+});
+
+document.addEventListener("keydown", e => {
+  if (!document.getElementById("lightbox").classList.contains("open")) return;
+  if (e.key === "ArrowRight") shiftLightbox(1);
+  if (e.key === "ArrowLeft")  shiftLightbox(-1);
+  if (e.key === "Escape")     closeLightbox();
+});
+</script>
+</body>
+</html>
