@@ -1044,7 +1044,7 @@ async function submitForm() {
 
 
 /* ── IMGBB UPLOAD ── */
-const IMGBB_KEY = "paste_your_key_here"; // ← replace with your ImgBB API key
+// ImgBB key is handled server-side via Netlify function
 
 async function handleUpload(input) {
   const file = input.files[0];
@@ -1059,18 +1059,24 @@ async function handleUpload(input) {
   document.getElementById("uploadPreview").style.display = "none";
 
   try {
-    const formData = new FormData();
-    formData.append("image", file);
+    // Convert file to base64 for proxy
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
 
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+    const res = await fetch("/.netlify/functions/imgbb-upload", {
       method: "POST",
-      body: formData
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: base64, name: file.name }),
     });
 
     const data = await res.json();
 
-    if (data.success) {
-      const url = data.data.url;
+    if (data.url) {
+      const url = data.url;
       document.getElementById("photo").value = url;
 
       // show preview
