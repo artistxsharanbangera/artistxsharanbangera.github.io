@@ -906,8 +906,8 @@ function updateSizePriceLabels() {
 
 /* ── STEPS ── */
 function goStep(n) {
-  // validate step 1
-  if (n === 2) {
+  // validate step 2 (details)
+  if (n === 3) {
     const name = document.getElementById("name").value.trim();
     const phone = document.getElementById("phone").value.trim();
     if (!name || !phone) { alert("Please enter your name and phone number."); return; }
