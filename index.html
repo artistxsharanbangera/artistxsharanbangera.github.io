@@ -807,7 +807,7 @@ footer a { color: var(--gold); text-decoration: none; }
   <p>A real-world look at how different sizes compare</p>
   <div class="size-comparison-wrap">
     <img src="images/size-comparison.jpg" alt="Size comparison of different portrait sizes" class="size-comparison-img">
-  </div> 
+  </div>
 </section>
 
 <!-- ── AVAILABILITY ── -->
@@ -1078,6 +1078,24 @@ renderCalendar();
 
   draw();
 })();
+
+/* ── PRICE THUMBNAIL LIGHTBOX ── */
+function openPriceThumb(src, label) {
+  document.getElementById("priceLightboxImg").src = src;
+  document.getElementById("priceLightboxLabel").textContent = label;
+  document.getElementById("priceLightbox").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closePriceThumb() {
+  document.getElementById("priceLightbox").classList.remove("open");
+  document.body.style.overflow = "";
+}
+document.getElementById("priceLightbox").addEventListener("click", function(e) {
+  if (e.target === this) closePriceThumb();
+});
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") closePriceThumb();
+});
 
 /* ── SCROLL REVEAL ── */
 const observer = new IntersectionObserver(entries => {
