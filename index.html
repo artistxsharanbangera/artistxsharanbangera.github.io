@@ -1090,11 +1090,14 @@ function closePriceThumb() {
   document.getElementById("priceLightbox").classList.remove("open");
   document.body.style.overflow = "";
 }
-document.getElementById("priceLightbox").addEventListener("click", function(e) {
-  if (e.target === this) closePriceThumb();
-});
 document.addEventListener("keydown", function(e) {
   if (e.key === "Escape") closePriceThumb();
+});
+window.addEventListener("load", function() {
+  var lb = document.getElementById("priceLightbox");
+  if (lb) lb.addEventListener("click", function(e) {
+    if (e.target === this) closePriceThumb();
+  });
 });
 
 /* ── SCROLL REVEAL ── */
