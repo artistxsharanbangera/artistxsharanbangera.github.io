@@ -96,7 +96,7 @@ exports.handler = async function(event) {
       .sort((a, b) => a.rate - b.rate)
       .map(c => ({
         name: c.courier_name,
-        rate: Math.ceil(c.rate),
+        rate: Math.ceil(c.rate) + 100, // includes packaging
         etd:  c.etd || c.estimated_delivery_days || "3-5 days",
       }));
 
@@ -105,7 +105,7 @@ exports.handler = async function(event) {
       const fallback = ratesData.data.available_courier_companies
         .filter(c => c.rate > 0)
         .sort((a, b) => a.rate - b.rate)[0];
-      if (fallback) couriers = [{ name: fallback.courier_name, rate: Math.ceil(fallback.rate), etd: fallback.etd || "3-5 days" }];
+      if (fallback) couriers = [{ name: fallback.courier_name, rate: Math.ceil(fallback.rate) + 100, etd: fallback.etd || "3-5 days" }];
     }
 
     return {
