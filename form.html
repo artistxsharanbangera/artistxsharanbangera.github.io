@@ -590,6 +590,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       </div>
 
       <div class="field-group">
+        <label>Delivery Address</label>
+        <textarea id="address" placeholder="House / flat no., street, city, state, pincode..." style="min-height:70px;"></textarea>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:6px; line-height:1.6;">
+          📦 Delivery charges of ₹100–₹300 apply depending on location
+        </div>
+      </div>
+
+      <div class="field-group">
         <label>Preferred Date</label>
         <input type="date" id="date">
       </div>
@@ -838,6 +846,7 @@ function buildSummary() {
     ["Name",    document.getElementById("name").value],
     ["Phone",   document.getElementById("phone").value],
     ["Email",   document.getElementById("email").value || "—"],
+    ["Address", document.getElementById("address").value || "—"],
     ["Date",    document.getElementById("date").value || "—"],
     ["Intent",  document.getElementById("intent").value],
     ["Type",    typeLabel],
@@ -879,10 +888,11 @@ async function submitForm() {
 
   try {
     await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, {
-      name:   document.getElementById("name").value,
-      phone:  document.getElementById("phone").value,
-      email:  document.getElementById("email").value || "—",
-      date:   document.getElementById("date").value || "—",
+      name:    document.getElementById("name").value,
+      phone:   document.getElementById("phone").value,
+      email:   document.getElementById("email").value || "—",
+      address: document.getElementById("address").value || "—",
+      date:    document.getElementById("date").value || "—",
       intent: document.getElementById("intent").value,
       type:   typeLabel,
       size:   selectedSize,
@@ -915,7 +925,7 @@ async function submitForm() {
 
 
 /* ── IMGBB UPLOAD ── */
-const IMGBB_KEY = "107a384268c8a22d108ef933d99995a6"; // ← replace with your ImgBB API key
+const IMGBB_KEY = "paste_your_key_here"; // ← replace with your ImgBB API key
 
 async function handleUpload(input) {
   const file = input.files[0];
