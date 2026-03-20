@@ -15,6 +15,16 @@ const DIMENSIONS = {
   A3: { length: 46, breadth: 34, height: 2 },
 };
 
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function onRequestOptions() {
+  return new Response(null, { status: 204, headers: CORS });
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -23,7 +33,7 @@ export async function onRequestPost(context) {
     const { pincode, size = "A4", frame = "none" } = body;
 
     if (!pincode || !/^\d{6}$/.test(pincode)) {
-      return Response.json({ error: "Invalid pincode" }, { status: 400 });
+      return Response.json({ error: "Invalid pincode" }, { status: 400, headers: CORS });
     }
 
     // Step 1: Authenticate
@@ -38,7 +48,7 @@ export async function onRequestPost(context) {
 
     const authData = await authRes.json();
     if (!authData.token) {
-      return Response.json({ error: "Shiprocket authentication failed" }, { status: 502 });
+      return Response.json({ error: "Shiprocket authentication failed" }, { status: 502, headers: CORS });
     }
 
     const weight = WEIGHTS[size]?.[frame] ?? 0.3;
@@ -64,7 +74,7 @@ export async function onRequestPost(context) {
     const available = ratesData?.data?.available_courier_companies;
 
     if (!available || available.length === 0) {
-      return Response.json({ error: "No couriers available for this pincode" });
+      return Response.json({ error: "No couriers available for this pincode" }, { headers: CORS });
     }
 
     // Step 3: Filter to DTDC/Delhivery, pick cheapest
@@ -86,10 +96,10 @@ export async function onRequestPost(context) {
       etd:  c.etd || "3-5 days",
     }));
 
-    return Response.json({ couriers: result });
+    return Response.json({ couriers: result }, { headers: CORS });
 
   } catch (err) {
     console.error("Shiprocket error:", err);
-    return Response.json({ error: "Something went wrong" }, { status: 500 });
+    return Response.json({ error: "Something went wrong" }, { status: 500, headers: CORS });
   }
 }
