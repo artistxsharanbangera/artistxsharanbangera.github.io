@@ -89,16 +89,24 @@ exports.handler = async function(event) {
       };
     }
 
-    // Step 3: Pick best options to return
-    const couriers = ratesData.data.available_courier_companies
-      .filter(c => c.rate > 0)
+    // Step 3: Filter to preferred couriers only
+    const preferred = ["dtdc", "delhivery"];
+    let couriers = ratesData.data.available_courier_companies
+      .filter(c => c.rate > 0 && preferred.some(p => c.courier_name.toLowerCase().includes(p)))
       .sort((a, b) => a.rate - b.rate)
-      .slice(0, 4)
       .map(c => ({
-        name:         c.courier_name,
-        rate:         Math.ceil(c.rate),
-        etd:          c.etd || c.estimated_delivery_days || "3-5 days",
+        name: c.courier_name,
+        rate: Math.ceil(c.rate),
+        etd:  c.etd || c.estimated_delivery_days || "3-5 days",
       }));
+
+    // fallback to cheapest available if neither found
+    if (couriers.length === 0) {
+      const fallback = ratesData.data.available_courier_companies
+        .filter(c => c.rate > 0)
+        .sort((a, b) => a.rate - b.rate)[0];
+      if (fallback) couriers = [{ name: fallback.courier_name, rate: Math.ceil(fallback.rate), etd: fallback.etd || "3-5 days" }];
+    }
 
     return {
       statusCode: 200,
