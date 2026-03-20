@@ -481,6 +481,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   line-height: 1.6;
 }
 
+/* ── PINCODE DELIVERY ── */
+.delivery-estimate { font-size:0.78rem; line-height:1.6; min-height:18px; padding:0 4px; transition:all 0.2s; }
+.delivery-ok { color: var(--gold-lt); }
+
 /* ── UPLOAD ZONE ── */
 .upload-zone {
   border: 1px dashed rgba(201,169,110,0.3);
@@ -592,8 +596,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <div class="field-group">
         <label>Delivery Address</label>
         <textarea id="address" placeholder="House / flat no., street, city, state, pincode..." style="min-height:70px;"></textarea>
-        <div style="font-size:0.7rem; color:var(--muted); margin-top:6px; line-height:1.6;">
-          📦 Delivery charges of ₹100–₹300 apply depending on location
+        <div class="pincode-row">
+          <input type="text" id="pincode" placeholder="Enter pincode for delivery estimate" maxlength="6" oninput="estimateDelivery()" style="margin-top:8px; margin-bottom:4px;">
+          <div class="delivery-estimate" id="deliveryEstimate"></div>
         </div>
       </div>
 
@@ -655,6 +660,24 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       </div>
 
       <div class="field-group">
+        <label>Frame</label>
+        <div class="type-options" style="grid-template-columns:repeat(3,1fr);">
+          <div class="type-opt selected" data-frame="none" onclick="selectFrame(this)">
+            <span class="type-name">No Frame</span>
+            <span class="type-desc">Flat-packed safely</span>
+          </div>
+          <div class="type-opt" data-frame="standard" onclick="selectFrame(this)">
+            <span class="type-name">Standard</span>
+            <span class="type-desc" id="stdFrameDesc">Clean wooden frame · +₹800</span>
+          </div>
+          <div class="type-opt" data-frame="premium" onclick="selectFrame(this)">
+            <span class="type-name">Premium</span>
+            <span class="type-desc" id="premFrameDesc">Designer frame · +₹1,500</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
         <label>Number of People</label>
         <div class="people-counter">
           <button class="counter-btn" onclick="changePeople(-1)">−</button>
@@ -690,9 +713,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <div class="upload-text">Uploading...</div>
           </div>
           <div class="upload-done" id="uploadDone" style="display:none">
-            <img id="uploadPreview" src="" alt="Preview">
+            <img id="uploadPreview" src="" alt="Preview" style="display:none">
             <div class="upload-done-info">
-              <div class="upload-text" style="color:var(--gold-lt)">✓ Photo uploaded</div>
+              <div class="upload-text" id="uploadStatus" style="color:var(--muted)">Uploading...</div>
               <div class="upload-sub" id="uploadName"></div>
               <div class="upload-change">Tap to change</div>
             </div>
@@ -763,7 +786,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* ── STATE ── */
 let selectedType = "bw";
 let selectedSize = "A4";
+let selectedFrame = "none";
 let people = 1;
+let deliveryCharge = 0;
 
 const prices = {
   bw:    { A5: [1000,500],  A4: [2500,1200],  A3: [7000,2000] },
@@ -771,6 +796,73 @@ const prices = {
 };
 
 const sizePriceLabels = { A5: "from ₹1,000", A4: "from ₹2,500", A3: "from ₹7,000" };
+
+const framePrices = {
+  none:     { A5: 0,    A4: 0,    A3: 0    },
+  standard: { A5: 400,  A4: 800,  A3: 1200 },
+  premium:  { A5: 700,  A4: 1500, A3: 2200 },
+};
+
+function frameLabel(frame) {
+  if (frame === "none") return "No Frame";
+  const p = framePrices[frame][selectedSize];
+  const name = frame === "standard" ? "Standard Frame" : "Premium Frame";
+  return p > 0 ? `${name} (+₹${p.toLocaleString("en-IN")})` : name;
+}
+
+const baseDelivery  = { local: 100, state: 150, national: 300 };
+const framedExtra   = { local: 50,  state: 100, national: 150 };
+const zoneLabels    = { local: "Karnataka", state: "Neighbouring state", national: "Rest of India" };
+const pincodeZones  = {
+  "56":"local","57":"local","58":"local","59":"local",
+  "50":"state","51":"state","52":"state","53":"state",
+  "60":"state","61":"state","62":"state","63":"state","64":"state",
+  "67":"state","68":"state","69":"state",
+  "40":"national","41":"national","42":"national","43":"national","44":"national",
+  "11":"national","12":"national","13":"national","14":"national",
+  "70":"national","71":"national","72":"national","73":"national",
+  "38":"national","39":"national",
+  "20":"national","21":"national","22":"national","23":"national","24":"national",
+  "25":"national","26":"national","27":"national","28":"national",
+  "30":"national","31":"national","32":"national","33":"national",
+};
+
+function selectFrame(el) {
+  document.querySelectorAll("[data-frame]").forEach(e => e.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedFrame = el.dataset.frame;
+  updateFrameDescs();
+  updatePrice();
+  estimateDelivery();
+}
+
+function updateFrameDescs() {
+  const s = document.getElementById("stdFrameDesc");
+  const p = document.getElementById("premFrameDesc");
+  if (s) s.textContent = `Clean wooden frame · +₹${framePrices.standard[selectedSize].toLocaleString("en-IN")}`;
+  if (p) p.textContent = `Designer frame · +₹${framePrices.premium[selectedSize].toLocaleString("en-IN")}`;
+}
+
+function estimateDelivery() {
+  const pin   = (document.getElementById("pincode") || {value:""}).value.trim();
+  const el    = document.getElementById("deliveryEstimate");
+  const lineEl= document.getElementById("deliveryLine");
+  if (!pin || pin.length < 6) {
+    deliveryCharge = 0;
+    if (el)     el.textContent = "";
+    if (lineEl) lineEl.textContent = "";
+    updatePrice(); return;
+  }
+  const zone   = pincodeZones[pin.substring(0,2)] || "national";
+  const framed = selectedFrame !== "none";
+  deliveryCharge = baseDelivery[zone] + (framed ? framedExtra[zone] : 0);
+  if (el) {
+    el.className = "delivery-estimate delivery-ok";
+    el.innerHTML = `📦 ${zoneLabels[zone]} · ₹${deliveryCharge}${framed ? " (includes framing surcharge)" : ""}`;
+  }
+  if (lineEl) lineEl.textContent = `+ ₹${deliveryCharge} delivery`;
+  updatePrice();
+}
 
 function selectType(el) {
   document.querySelectorAll(".type-opt").forEach(e => e.classList.remove("selected"));
@@ -785,6 +877,8 @@ function selectSize(el) {
   el.classList.add("selected");
   selectedSize = el.dataset.size;
   updatePrice();
+  updateSizePriceLabels();
+  updateFrameDescs();
 }
 
 function changePeople(dir) {
@@ -795,10 +889,15 @@ function changePeople(dir) {
 
 function updatePrice() {
   const [base, extra] = prices[selectedType][selectedSize];
-  const total = base + (people - 1) * extra;
-  document.getElementById("price").textContent = total.toLocaleString("en-IN");
-  let breakdown = `Base ₹${base.toLocaleString("en-IN")}`;
-  if (people > 1) breakdown += ` · +${people-1} person${people>2?'s':''} ₹${((people-1)*extra).toLocaleString("en-IN")}`;
+  const frameAmt = framePrices[selectedFrame][selectedSize];
+  const artTotal = base + (people - 1) * extra + frameAmt;
+  const grandTotal = artTotal + deliveryCharge;
+  document.getElementById("price").textContent = grandTotal.toLocaleString("en-IN");
+  const lineEl = document.getElementById("deliveryLine");
+  if (lineEl) lineEl.textContent = deliveryCharge > 0 ? `+ ₹${deliveryCharge} delivery` : "";
+  let breakdown = `Art ₹${artTotal.toLocaleString("en-IN")}`;
+  if (people > 1) breakdown += ` · +${people-1} extra`;
+  if (selectedFrame !== "none") breakdown += ` · ${frameLabel(selectedFrame)}`;
   document.getElementById("priceBreakdown").textContent = breakdown;
 }
 
@@ -842,18 +941,24 @@ function buildSummary() {
   const [base, extra] = prices[selectedType][selectedSize];
   const total = base + (people - 1) * extra;
 
+  const frameAmt   = framePrices[selectedFrame][selectedSize];
+  const artTotal   = base + (people - 1) * extra + frameAmt;
+  const grandTotal = artTotal + deliveryCharge;
+
   const rows = [
-    ["Name",    document.getElementById("name").value],
-    ["Phone",   document.getElementById("phone").value],
-    ["Email",   document.getElementById("email").value || "—"],
-    ["Address", document.getElementById("address").value || "—"],
-    ["Date",    document.getElementById("date").value || "—"],
-    ["Intent",  document.getElementById("intent").value],
-    ["Type",    typeLabel],
-    ["Size",    `${selectedSize} (${selectedSize==="A5"?"14.8×21":selectedSize==="A4"?"21×29.7":"29.7×42"} cm)`],
-    ["People",  people],
-    ["Photo",   document.getElementById("photo").value || "—"],
-    ["Notes",   document.getElementById("notes").value || "—"],
+    ["Name",     document.getElementById("name").value],
+    ["Phone",    document.getElementById("phone").value],
+    ["Email",    document.getElementById("email").value || "—"],
+    ["Address",  document.getElementById("address").value || "—"],
+    ["Date",     document.getElementById("date").value || "—"],
+    ["Intent",   document.getElementById("intent").value],
+    ["Type",     typeLabel],
+    ["Size",     `${selectedSize} (${selectedSize==="A5"?"14.8×21":selectedSize==="A4"?"21×29.7":"29.7×42"} cm)`],
+    ["People",   people],
+    ["Frame",    frameLabel(selectedFrame)],
+    ["Delivery", deliveryCharge > 0 ? `₹${deliveryCharge}` : "TBD (enter pincode)"],
+    ["Photo",    document.getElementById("photo").value || "—"],
+    ["Notes",    document.getElementById("notes").value || "—"],
   ];
 
   const html = rows.map(([k,v]) => `
@@ -864,7 +969,7 @@ function buildSummary() {
   `).join("") + `
     <div class="summary-row summary-total" style="margin-top:12px;padding-top:16px;border-top:1px solid rgba(201,169,110,0.15);border-bottom:none;">
       <span class="summary-key">Estimated Total</span>
-      <span class="summary-val">₹${total.toLocaleString("en-IN")}</span>
+      <span class="summary-val">₹${grandTotal.toLocaleString("en-IN")}</span>
     </div>
   `;
 
@@ -899,7 +1004,9 @@ async function submitForm() {
       people: people,
       price:  total.toLocaleString("en-IN"),
       photo:  document.getElementById("photo").value || "—",
-      notes:  document.getElementById("notes").value || "—",
+      notes:    document.getElementById("notes").value || "—",
+      frame:    frameLabel(selectedFrame),
+      delivery: deliveryCharge > 0 ? `₹${deliveryCharge}` : "TBD",
     }, EJS_KEY);
 
     // show success state
@@ -933,8 +1040,11 @@ async function handleUpload(input) {
 
   // show progress
   document.getElementById("uploadIdle").style.display = "none";
-  document.getElementById("uploadDone").style.display = "none";
-  document.getElementById("uploadProgress").style.display = "flex";
+  document.getElementById("uploadProgress").style.display = "none";
+  document.getElementById("uploadDone").style.display = "flex";
+  document.getElementById("uploadStatus").style.color = "var(--muted)";
+  document.getElementById("uploadStatus").textContent = "Uploading...";
+  document.getElementById("uploadPreview").style.display = "none";
 
   try {
     const formData = new FormData();
@@ -952,15 +1062,26 @@ async function handleUpload(input) {
       document.getElementById("photo").value = url;
 
       // show preview
-      document.getElementById("uploadPreview").src = URL.createObjectURL(file);
+      const objectUrl = URL.createObjectURL(file);
+      const previewImg = document.getElementById("uploadPreview");
+      const statusEl   = document.getElementById("uploadStatus");
+      previewImg.onload = function() {
+        previewImg.style.display = "block";
+        statusEl.style.color = "var(--gold-lt)";
+        statusEl.textContent = "✓ Photo uploaded";
+      };
+      previewImg.onerror = function() {
+        previewImg.style.display = "none";
+        statusEl.style.color = "var(--gold-lt)";
+        statusEl.textContent = "✓ Photo uploaded";
+      };
+      previewImg.src = objectUrl;
       document.getElementById("uploadName").textContent = file.name;
-      document.getElementById("uploadProgress").style.display = "none";
-      document.getElementById("uploadDone").style.display = "flex";
     } else {
       throw new Error("Upload failed");
     }
   } catch (err) {
-    document.getElementById("uploadProgress").style.display = "none";
+    document.getElementById("uploadDone").style.display = "none";
     document.getElementById("uploadIdle").style.display = "flex";
     alert("Upload failed. Please try again or paste an image link instead.");
   }
@@ -968,6 +1089,7 @@ async function handleUpload(input) {
 
 /* ── INIT ── */
 emailjs.init(EJS_KEY);
+updateFrameDescs();
 updatePrice();
 </script>
 </body>
