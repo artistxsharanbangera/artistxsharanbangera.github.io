@@ -100,6 +100,9 @@ exports.handler = async function(event) {
         etd:  c.etd || c.estimated_delivery_days || "3-5 days",
       }));
 
+    // keep only the cheapest one
+    if (couriers.length > 1) couriers = [couriers[0]];
+
     // fallback to cheapest available if neither found
     if (couriers.length === 0) {
       const fallback = ratesData.data.available_courier_companies
