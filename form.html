@@ -884,16 +884,12 @@ async function fetchRates() {
 
     el.textContent = "";
     list.style.display = "block";
-    list.innerHTML = `
-      <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Select a courier</div>
-      ${data.couriers.map(c => `
-        <div class="courier-opt" onclick="selectCourier(this, ${c.rate}, '${c.name}')" data-rate="${c.rate}">
-          <span class="courier-name">${c.name}</span>
-          <span class="courier-meta">${c.etd}</span>
-          <span class="courier-price">₹${c.rate}</span>
-        </div>
-      `).join("")}
-    `;
+    list.innerHTML = data.couriers.map(c => `
+      <div class="courier-opt" onclick="selectCourier(this, ${c.rate}, '${c.name}')" data-rate="${c.rate}">
+        <span class="courier-name">${c.name}</span>
+        <span class="courier-price">₹${c.rate}</span>
+      </div>
+    `).join("");
 
     // auto-select cheapest
     const first = list.querySelector(".courier-opt");
